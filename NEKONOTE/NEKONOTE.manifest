@@ -1,0 +1,13 @@
+{
+	"autodeskProduct":	"Fusion360",
+	"type":	"addin",
+	"id":	"2abd679d-2ebb-4be0-b86c-6537964f4f85",
+	"author":	"kantoku",
+	"description":	{
+		"":	"A little help with show/hide"
+	},
+	"version":	"0.0.1",
+	"runOnStartup":	false,
+	"supportedOS":	"windows|mac",
+	"editEnabled":	true
+}
