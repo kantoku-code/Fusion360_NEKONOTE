@@ -70,42 +70,52 @@ function addEventListener_Button(btn, value) {
 // };
 
 document.addEventListener("DOMContentLoaded", () => {
-    let adskWaiter = setInterval(() => {
+    // let adskWaiter = setInterval(() => {
         console.log("DOMContentLoaded");
-        if (window.adsk) {
-            console.log("adsk ok");
-            clearInterval(adskWaiter);
+        // if (window.adsk) {
+            const div2 = document.getElementById("div2");
+            // if (!div2.hasChildNodes()) {
+            //     const input1 = document.createElement("input");
+            //     input1.setAttribute("type", "text");
+            //     input1.setAttribute("maxlength", "5");
+            //     input1.setAttribute("size", "10");
+            //     input1.setAttribute("value", "初期表示");
+            //     div2.appendChild(input1);
+            // }
 
-            let element = document.getElementById("xxx");
-            adsk
-            .fusionSendData("DOMContentLoaded", "{}")
-            .then((data) =>
-                element.insertAdjacentHTML("afterend", "<p>" + data + "</p>")
-            );
-        }
-    }, 100);
+            const btn = document.createElement("button");
+            btn.setAttribute("class", "btn btn-primary btn-sm customBtn");
+            btn.setAttribute("type", "button");
+            btn.setAttribute("id", "OriginWorkGeometry_Show");
+            btn.setAttribute("data-bs-toggle", "tooltip");
+            btn.setAttribute("data-bs-placement", "top");
+            btn.setAttribute("title", "OriginWorkGeometry Show");
+            btn.innerHTML = '<i class="bi bi-asterisk"></i>';
+            div2.appendChild(btn);
+
+            // var button = document.getElementById('div2')
+            // var bsButton = new bootstrap.Button(button)
+
+        // }
+    // }, 100);
 })
 
-$(document).ready(function() {
-    $('#container').append('<input type="button" id="submit" value="Submit" class="btn">');
-});
+// document.addEventListener("DOMContentLoaded", () => {
+//     let adskWaiter = setInterval(() => {
+//         console.log("DOMContentLoaded");
+//         if (window.adsk) {
+//             console.log("adsk ok");
+//             clearInterval(adskWaiter);
 
-document.addEventListener("DOMContentLoaded", () => {
-    let adskWaiter = setInterval(() => {
-        console.log("DOMContentLoaded");
-        if (window.adsk) {
-            console.log("adsk ok");
-            clearInterval(adskWaiter);
-
-            let element = document.getElementById("xxx");
-            adsk
-            .fusionSendData("DOMContentLoaded", "{}")
-            .then((data) =>
-                element.insertAdjacentHTML("afterend", "<p>" + data + "</p>")
-            );
-        }
-    }, 100);
-});
+//             let element = document.getElementById("xxx");
+//             adsk
+//             .fusionSendData("DOMContentLoaded", "{}")
+//             .then((data) =>
+//                 element.insertAdjacentHTML("afterend", "<p>" + data + "</p>")
+//             );
+//         }
+//     }, 100);
+// });
 
 //   $(document).ready(function() {
 //     $('<input type="button" id="submit" value="Submit" class="btn">').appendTo('#container');
