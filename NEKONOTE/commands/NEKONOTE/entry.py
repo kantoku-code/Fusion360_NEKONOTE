@@ -9,10 +9,10 @@ app = adsk.core.Application.get()
 ui = app.userInterface
 
 # TODO ********************* Change these names *********************
-CMD_ID = f'{config.COMPANY_NAME}_{config.ADDIN_NAME}_PalleteShow'
-CMD_NAME = 'Show My Palette'
+CMD_ID = f'{config.COMPANY_NAME}_{config.ADDIN_NAME}_nekonote'
+CMD_NAME = 'NEKONOTE'
 CMD_Description = 'A Fusion 360 Add-in Palette'
-PALETTE_NAME = 'My Palette Sample'
+PALETTE_NAME = '🐾 NEKONOTE 🐾'
 IS_PROMOTED = False
 
 # Using "global" variables by referencing values from /config.py
@@ -26,7 +26,7 @@ PALETTE_URL = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resource
 PALETTE_URL = PALETTE_URL.replace('\\', '/')
 
 # Set a default docking behavior for the palette
-PALETTE_DOCKING = adsk.core.PaletteDockingStates.PaletteDockStateRight
+PALETTE_DOCKING = adsk.core.PaletteDockingStates.PaletteDockStateFloating #adsk.core.PaletteDockingStates.PaletteDockStateRight
 
 # TODO *** Define the location where the command button will be created. ***
 # This is done by specifying the workspace, the tab, and the panel, and the 
@@ -42,6 +42,21 @@ ICON_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resource
 # Local list of event handlers used to maintain a reference so
 # they are not released and garbage collected.
 local_handlers = []
+
+
+KEYMAP = {
+    "OriginWorkGeometry": "rOriginWorkGeometry",
+    "JointOrigins": "rJointOrigins",
+    "AssyConstraints": "rAssyConstraints",
+    "Bodies": "rBodies",
+    "Sketches": "rSketches",
+    "Canvases": "rCanvases",
+    "DecalPatches": "rDecalPatches",
+    "WorkGeometries": "rWorkGeometries",
+    "WorkGeometries": "rWorkGeometries",
+    "VisualAnalyses": "VisualAnalyses",
+}
+
 
 
 # Executed when add-in is run.
@@ -117,10 +132,11 @@ def command_execute(args: adsk.core.CommandEventArgs):
             isVisible=True,
             showCloseButton=True,
             isResizable=True,
-            width=650,
-            height=600,
+            width=250,
+            height=300,
             useNewWebBrowser=True
         )
+        palette.setPosition(900,200)
         futil.add_handler(palette.closed, palette_closed)
         futil.add_handler(palette.navigatingURL, palette_navigating)
         futil.add_handler(palette.incomingFromHTML, palette_incoming)
@@ -169,20 +185,13 @@ def palette_incoming(html_args: adsk.core.HTMLEventArgs):
 
     # TODO ******** Your palette reaction code here ********
 
-    # Read message sent from palette javascript and react appropriately.
-    if message_action == 'messageFromPalette':
-        arg1 = message_data.get('arg1', 'arg1 not sent')
-        arg2 = message_data.get('arg2', 'arg2 not sent')
-
-        msg = 'An event has been fired from the html to Fusion with the following data:<br/>'
-        msg += f'<b>Action</b>: {message_action}<br/><b>arg1</b>: {arg1}<br/><b>arg2</b>: {arg2}'               
-        ui.messageBox(msg)
-
-    # Return value.
-    now = datetime.now()
-    currentTime = now.strftime('%H:%M:%S')
-    html_args.returnData = f'OK - {currentTime}'
-
+    # if message_action == 'originShow':
+    #     setTreeFolderVisible("rOriginWorkGeometry", True)
+    # elif message_action == 'originHide':
+    #     setTreeFolderVisible("rOriginWorkGeometry", False)
+    dd=message_data['value']
+    ss=KEYMAP[message_action]
+    setTreeFolderVisible(KEYMAP[message_action], message_data['value'])
 
 # This event handler is called when the command terminates.
 def command_destroy(args: adsk.core.CommandEventArgs):
@@ -191,3 +200,150 @@ def command_destroy(args: adsk.core.CommandEventArgs):
 
     global local_handlers
     local_handlers = []
+
+
+# *********************
+# Tree Folder Visible
+def setTreeFolderVisible(key: str, value: bool):
+
+    def getVisualAnalysesPaths() -> str:
+        app: adsk.core.Application = adsk.core.Application.get()
+        rootOccId = app.executeTextCommand(u'PEntity.ID rootInstance')
+        rootComp = getPorpsKey(rootOccId, "rTargetComponent")
+        analysesId = app.executeTextCommand(u'PEntity.ID VisualAnalyses')
+
+        return f'{rootOccId}:{rootComp["entityId"]}:{analysesId}'
+
+    def getIdsPaths() -> list:
+        occPaths = getOccPaths()
+        compIds = getTargetComponentIds(occPaths)
+        originIds = getPorpsKeyIds(compIds, key)
+
+        pathsLst = []
+        for lst in zip(occPaths, compIds, originIds):
+            pathsLst.append(':'.join(lst))
+
+        return pathsLst
+    # ************
+
+    app: adsk.core.Application = adsk.core.Application.get()
+    sels: adsk.core.Selections = app.userInterface.activeSelections
+    sels.clear()
+
+    ents: list = []
+    if key == "VisualAnalyses":
+        ents.append(getVisualAnalysesPaths())
+    else:
+        ents = getIdsPaths()
+
+    ents = [paths for paths in ents if isVisible(paths) != value]
+    if len(ents) < 1:
+        return
+
+    for paths in ents:
+        try:
+            app.executeTextCommand(u'Selections.Add {}'.format(paths))
+        except:
+            pass
+
+    app.executeTextCommand(u'Commands.Start VisibilityToggleCmd')
+    sels.clear()
+
+# ****************
+def isVisible(paths) -> bool:
+    try:
+        props = getPorps(paths)
+        for visible_Key in ("isVisible", "visible"):
+            if not visible_Key in props:
+                continue
+            return getPorpsKey(paths, visible_Key)
+
+    except:
+        return False
+    # "isVisible", "visible" 以外はNone = Falseを返すが良いのか?
+
+
+def getTargetComponentIds(lst) -> list:
+    return getPorpsKeyIds(lst, "rTargetComponent")
+
+
+def getPorpsKeyIds(lst, key) -> list:
+    idsLst = []
+    for paths in lst:
+        try:
+            res = getPorpsKey(paths, key)
+            idsLst.append(str(res['entityId']))
+        except:
+            idsLst.append('-1')
+
+    return idsLst
+
+
+def getPorpsKey(paths, key = '') -> str:
+    app: adsk.core.Application = adsk.core.Application.get()
+
+    try:
+        id = paths.split(':')[-1]
+
+        props = getPorps(paths)
+        return props[key]
+    except:
+        return '-1'
+
+
+def getPorps(paths) -> dict:
+    app: adsk.core.Application = adsk.core.Application.get()
+
+    try:
+        id = paths.split(':')[-1]
+
+        props = json.loads(
+            app.executeTextCommand(u'PEntity.Properties {}'.format(id))
+        )
+
+        return props
+    except:
+        return '-1'
+
+
+def getOccPaths() -> list:
+    app: adsk.core.Application = adsk.core.Application.get()
+
+    def getAllOccIds() -> list:
+        app: adsk.core.Application = adsk.core.Application.get()
+        res = app.executeTextCommand(u'PEntity.Properties ComponentInstancesRoot')
+        compInstancesProps = json.loads(res)
+
+        ids = []
+        for info in compInstancesProps["rooted"]:
+            id = info["entityId"]
+            if id < 0:
+                continue
+            ids.append(id)
+
+        return ids
+
+    def getOccFullPaths(id: int):
+        entId = id
+        stackIds = [id]
+        while True:
+            pass
+            prop = getPorpsKey(str(entId), "rParent")
+            if not 'entityId' in prop:
+                break
+            entId = prop['entityId']
+            if entId < 0:
+                break
+            stackIds.append(entId)
+
+        return ':'.join([str(id) for id in stackIds[::-1]])
+
+    # *************
+    occIds = getAllOccIds()
+    pathsLst = [getOccFullPaths(id) for id in occIds]
+    pathsLst.append(
+        str(
+            app.executeTextCommand(u'PEntity.ID rootInstance')
+        )
+    )
+    return pathsLst
