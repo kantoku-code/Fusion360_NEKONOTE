@@ -13,7 +13,7 @@ CMD_ID = f'{config.COMPANY_NAME}_{config.ADDIN_NAME}_nekonote'
 CMD_NAME = 'NEKONOTE'
 CMD_Description = 'A Fusion 360 Add-in Palette'
 PALETTE_NAME = '🐾 NEKONOTE 🐾'
-IS_PROMOTED = False
+IS_PROMOTED = True
 
 # Using "global" variables by referencing values from /config.py
 PALETTE_ID = config.sample_palette_id
@@ -132,8 +132,8 @@ def command_execute(args: adsk.core.CommandEventArgs):
             isVisible=True,
             showCloseButton=True,
             isResizable=True,
-            width=250,
-            height=300,
+            width=400,
+            height=140,
             useNewWebBrowser=True
         )
         palette.setPosition(900,200)
