@@ -70,35 +70,62 @@ function addEventListener_Button(btn, value) {
 // };
 
 document.addEventListener("DOMContentLoaded", () => {
-    // let adskWaiter = setInterval(() => {
+    let adskWaiter = setInterval(() => {
         console.log("DOMContentLoaded");
-        // if (window.adsk) {
-            const div2 = document.getElementById("div2");
-            // if (!div2.hasChildNodes()) {
-            //     const input1 = document.createElement("input");
-            //     input1.setAttribute("type", "text");
-            //     input1.setAttribute("maxlength", "5");
-            //     input1.setAttribute("size", "10");
-            //     input1.setAttribute("value", "初期表示");
-            //     div2.appendChild(input1);
-            // }
+        if (window.adsk) {
+            console.log("adsk ok");
+            clearInterval(adskWaiter);
 
-            const btn = document.createElement("button");
-            btn.setAttribute("class", "btn btn-primary btn-sm customBtn");
-            btn.setAttribute("type", "button");
-            btn.setAttribute("id", "OriginWorkGeometry_Show");
-            btn.setAttribute("data-bs-toggle", "tooltip");
-            btn.setAttribute("data-bs-placement", "top");
-            btn.setAttribute("title", "OriginWorkGeometry Show");
-            btn.innerHTML = '<i class="bi bi-asterisk"></i>';
-            div2.appendChild(btn);
+            let data
+            adsk
+            .fusionSendData("DOMContentLoaded", "{}")
+            .then((data) => {
+                // element.insertAdjacentHTML("afterend", "<p>" + data + "</p>")
+                console.log("hoge")
+            // );
 
-            // var button = document.getElementById('div2')
-            // var bsButton = new bootstrap.Button(button)
+                const button_group = document.getElementById("button_group");
+                console.log(data)
+                const row = document.createElement("div");
+                row.setAttribute("class", "row g-1");
+                button_group.appendChild(row);
 
-        // }
-    // }, 100);
-})
+                const showhide = ['btn btn-primary btn-sm customBtn', 'btn btn-secondary btn-sm customBtn'];
+                const arr = [
+                    '<i class="bi bi-asterisk"></i>',
+                    '<i class="bi bi-lock"></i>',
+                    '<i class="bi bi-record-circle">',
+                    '<i class="bi bi-box"></i>',
+                    '<i class="bi bi-pencil"></i>',
+                    '<i class="bi bi-image"></i>',
+                    '<i class="bi bi-file-earmark-image"></i>',
+                    '<i class="bi bi-square"></i>',
+                    '<i class="bi bi-rulers"></i>',
+                ];
+
+                showhide.forEach((sh) => {
+                    const btnGrp = document.createElement("div");
+                    btnGrp.setAttribute("class", "btn-group btn-group-sm"); //me-1");
+                    btnGrp.setAttribute("role", "group");
+                    btnGrp.setAttribute("aria-label", "First group");
+                    row.appendChild(btnGrp);
+
+                    arr.forEach((elem) => {
+                        const btn = document.createElement("button");
+                        btn.setAttribute("class", sh);
+                        btn.setAttribute("type", "button");
+                        btn.setAttribute("id", "OriginWorkGeometry_Show");
+                        btn.setAttribute("data-bs-toggle", "tooltip");
+                        btn.setAttribute("data-bs-placement", "top");
+                        btn.setAttribute("title", "OriginWorkGeometry Show");
+                        btn.innerHTML = elem;
+                        btnGrp.appendChild(btn);
+                    });
+                });
+            });
+        }
+    }, 100);
+});
 
 // document.addEventListener("DOMContentLoaded", () => {
 //     let adskWaiter = setInterval(() => {

@@ -1,6 +1,7 @@
 import json
 import adsk.core
 import os
+import pathlib
 from ...lib import fusion360utils as futil
 from ... import config
 from datetime import datetime
@@ -43,6 +44,8 @@ ICON_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resource
 # they are not released and garbage collected.
 local_handlers = []
 
+THIS_DIR = pathlib.Path(__file__).resolve().parent
+BUTTONSETTING = str(THIS_DIR / 'button_setting.json')
 
 KEYMAP = {
     "OriginWorkGeometry": "rOriginWorkGeometry",
@@ -56,7 +59,6 @@ KEYMAP = {
     "WorkGeometries": "rWorkGeometries",
     "VisualAnalyses": "VisualAnalyses",
 }
-
 
 
 # Executed when add-in is run.
@@ -114,6 +116,9 @@ def command_created(args: adsk.core.CommandCreatedEventArgs):
     # Create the event handlers you will need for this instance of the command
     futil.add_handler(args.command.execute, command_execute, local_handlers=local_handlers)
     futil.add_handler(args.command.destroy, command_destroy, local_handlers=local_handlers)
+
+
+    a=1
 
 
 # Because no command inputs are being added in the command created event, the execute
@@ -185,13 +190,28 @@ def palette_incoming(html_args: adsk.core.HTMLEventArgs):
 
     # TODO ******** Your palette reaction code here ********
 
+    if message_action == 'DOMContentLoaded':
+        global app
+        lang = app.executeTextCommand(u'Options.GetUserLanguage')
+        with open(BUTTONSETTING, encoding='utf-8') as f:
+            button_Dict = json.loads(f.read())
+
+        if not lang in button_Dict:
+            lang = 'en-US'
+
+        html_args.returnData = json.dumps(button_Dict[lang])#, ensure_ascii=False, encoding='utf8')
+    else:
+        setTreeFolderVisible(KEYMAP[message_action], message_data['value'])
+
+
+
     # if message_action == 'originShow':
     #     setTreeFolderVisible("rOriginWorkGeometry", True)
     # elif message_action == 'originHide':
     #     setTreeFolderVisible("rOriginWorkGeometry", False)
-    dd=message_data['value']
-    ss=KEYMAP[message_action]
-    setTreeFolderVisible(KEYMAP[message_action], message_data['value'])
+    # dd = message_data['value']
+    # ss=KEYMAP[message_action]
+    
 
 # This event handler is called when the command terminates.
 def command_destroy(args: adsk.core.CommandEventArgs):
@@ -347,3 +367,13 @@ def getOccPaths() -> list:
         )
     )
     return pathsLst
+
+
+    # de :anzeigen/ausblenden
+    # en : show/hide
+    # es : mostrar/ocultar
+    # fr : afficher/cacher
+    # it :Mostra/nascondere
+    # jp :表示/非表示
+    # co :보여 주다/숨다
+    # ci :显示/隐藏/
