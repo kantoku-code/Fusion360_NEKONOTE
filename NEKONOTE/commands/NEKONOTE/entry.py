@@ -199,7 +199,8 @@ def palette_incoming(html_args: adsk.core.HTMLEventArgs):
         if not lang in button_Dict:
             lang = 'en-US'
 
-        html_args.returnData = json.dumps(button_Dict[lang])#, ensure_ascii=False, encoding='utf8')
+        # https://cortyuming.hateblo.jp/entry/20140920/p2
+        html_args.returnData = json.dumps(button_Dict[lang], ensure_ascii=False)#, encoding='utf8')
     else:
         setTreeFolderVisible(KEYMAP[message_action], message_data['value'])
 

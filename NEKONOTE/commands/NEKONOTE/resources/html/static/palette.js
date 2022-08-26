@@ -80,27 +80,33 @@ document.addEventListener("DOMContentLoaded", () => {
             adsk
             .fusionSendData("DOMContentLoaded", "{}")
             .then((data) => {
-                // element.insertAdjacentHTML("afterend", "<p>" + data + "</p>")
                 console.log("hoge")
-            // );
 
                 const button_group = document.getElementById("button_group");
                 console.log(data)
+                // console.log(data["Origin"])
+                let button_info = JSON.parse(data)
+                console.log(button_info["Origin"])
+
                 const row = document.createElement("div");
                 row.setAttribute("class", "row g-1");
                 button_group.appendChild(row);
 
-                const showhide = ['btn btn-primary btn-sm customBtn', 'btn btn-secondary btn-sm customBtn'];
-                const arr = [
-                    '<i class="bi bi-asterisk"></i>',
-                    '<i class="bi bi-lock"></i>',
-                    '<i class="bi bi-record-circle">',
-                    '<i class="bi bi-box"></i>',
-                    '<i class="bi bi-pencil"></i>',
-                    '<i class="bi bi-image"></i>',
-                    '<i class="bi bi-file-earmark-image"></i>',
-                    '<i class="bi bi-square"></i>',
-                    '<i class="bi bi-rulers"></i>',
+                const showhide = [
+                    'btn btn-primary btn-sm customBtn',
+                    'btn btn-secondary btn-sm customBtn'
+                ];
+
+                const keys = [
+                    ["Origin", '<i class="bi bi-asterisk"></i>',],
+                    ["Analysis", '<i class="bi bi-rulers"></i>',],
+                    ["Joint Origins", '<i class="bi bi-record-circle">',],
+                    ["Joints", '<i class="bi bi-lock"></i>',],
+                    ["Bodies", '<i class="bi bi-box"></i>',],
+                    ["Canvases", '<i class="bi bi-image"></i>',],
+                    ["Decals", '<i class="bi bi-file-earmark-image"></i>',],
+                    ["Sketches", '<i class="bi bi-pencil"></i>',],
+                    ["Construction", '<i class="bi bi-square"></i>',]
                 ];
 
                 showhide.forEach((sh) => {
@@ -110,15 +116,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     btnGrp.setAttribute("aria-label", "First group");
                     row.appendChild(btnGrp);
 
-                    arr.forEach((elem) => {
+                    keys.forEach((key) => {
                         const btn = document.createElement("button");
                         btn.setAttribute("class", sh);
                         btn.setAttribute("type", "button");
                         btn.setAttribute("id", "OriginWorkGeometry_Show");
                         btn.setAttribute("data-bs-toggle", "tooltip");
                         btn.setAttribute("data-bs-placement", "top");
-                        btn.setAttribute("title", "OriginWorkGeometry Show");
-                        btn.innerHTML = elem;
+                        btn.setAttribute("title", button_info[key[0]]);
+                        btn.innerHTML = key[1];
                         btnGrp.appendChild(btn);
                     });
                 });
