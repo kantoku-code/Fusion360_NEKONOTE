@@ -4,7 +4,7 @@ import os
 import pathlib
 from ...lib import fusion360utils as futil
 from ... import config
-from datetime import datetime
+from .show_hide_factry import setTreeFolderVisible
 
 app = adsk.core.Application.get()
 ui = app.userInterface
@@ -12,8 +12,8 @@ ui = app.userInterface
 # TODO ********************* Change these names *********************
 CMD_ID = f'{config.COMPANY_NAME}_{config.ADDIN_NAME}_nekonote'
 CMD_NAME = 'NEKONOTE'
-CMD_Description = 'A Fusion 360 Add-in Palette'
-PALETTE_NAME = '🐾 NEKONOTE 🐾'
+CMD_Description = 'Show/Hide BrowserTree Folders'
+PALETTE_NAME = "🐾 NEKO NO TE (Cat's hand)🐾"
 IS_PROMOTED = True
 
 # Using "global" variables by referencing values from /config.py
@@ -34,8 +34,8 @@ PALETTE_DOCKING = adsk.core.PaletteDockingStates.PaletteDockStateFloating #adsk.
 # command it will be inserted beside. Not providing the command to position it
 # will insert it at the end.
 WORKSPACE_ID = 'FusionSolidEnvironment'
-PANEL_ID = 'SolidScriptsAddinsPanel'
-COMMAND_BESIDE_ID = 'ScriptsManagerCommand'
+PANEL_ID = 'UtilityPanel'
+COMMAND_BESIDE_ID = 'FusionComputeAllCommand'
 
 # Resource location for command icons, here we assume a sub folder in this directory named "resources".
 ICON_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', '')
@@ -48,16 +48,15 @@ THIS_DIR = pathlib.Path(__file__).resolve().parent
 BUTTONSETTING = str(THIS_DIR / 'button_setting.json')
 
 KEYMAP = {
-    "OriginWorkGeometry": "rOriginWorkGeometry",
-    "JointOrigins": "rJointOrigins",
-    "AssyConstraints": "rAssyConstraints",
+    "Origin": "rOriginWorkGeometry",
+    "Analysis": "VisualAnalyses",
+    "Joint Origins": "rJointOrigins",
+    "Joints": "rAssyConstraints",
     "Bodies": "rBodies",
-    "Sketches": "rSketches",
     "Canvases": "rCanvases",
-    "DecalPatches": "rDecalPatches",
-    "WorkGeometries": "rWorkGeometries",
-    "WorkGeometries": "rWorkGeometries",
-    "VisualAnalyses": "VisualAnalyses",
+    "Decals": "rDecalPatches",
+    "Sketches": "rSketches",
+    "Construction": "rWorkGeometries",
 }
 
 
@@ -82,6 +81,14 @@ def start():
     # Specify if the command is promoted to the main toolbar. 
     control.isPromoted = IS_PROMOTED
 
+    msg = [
+        '         __           __    _  ________ ______  _  ______  __________  ',
+        '    ___ / /____ _____/ /_  / |/ / __/ //_/ __ \/ |/ / __ \/_  __/ __/  ',
+        '   (_-</ __/ _ `/ __/ __/ /    / _// ,< / /_/ /    / /_/ / / / / _/    ',
+        '  /___/\__/\_,_/_/  \__/ /_/|_/___/_/|_|\____/_/|_/\____/ /_/ /___/    ',
+    ]
+    app.log('\n'.join(msg))
+
 
 # Executed when add-in is stopped.
 def stop():
@@ -104,6 +111,15 @@ def stop():
     if palette:
         palette.deleteMe()
 
+    msg = [
+        '     __           ',
+        '    / /  __ _____ ',
+        '   / _ \/ // / -_)',
+        '  /_.__/\_, /\__/ ',
+        '       /___/      ',
+    ]
+    app.log('\n'.join(msg))
+
 
 # Event handler that is called when the user clicks the command button in the UI.
 # To have a dialog, you create the desired command inputs here. If you don't need
@@ -118,40 +134,13 @@ def command_created(args: adsk.core.CommandCreatedEventArgs):
     futil.add_handler(args.command.destroy, command_destroy, local_handlers=local_handlers)
 
 
-    a=1
-
-
 # Because no command inputs are being added in the command created event, the execute
 # event is immediately fired.
 def command_execute(args: adsk.core.CommandEventArgs):
     # General logging for debug.
     futil.log(f'{CMD_NAME}: Command execute event.')
 
-    palettes = ui.palettes
-    palette = palettes.itemById(PALETTE_ID)
-    if palette is None:
-        palette = palettes.add(
-            id=PALETTE_ID,
-            name=PALETTE_NAME,
-            htmlFileURL=PALETTE_URL,
-            isVisible=True,
-            showCloseButton=True,
-            isResizable=True,
-            width=400,
-            height=140,
-            useNewWebBrowser=True
-        )
-        palette.setPosition(900,200)
-        futil.add_handler(palette.closed, palette_closed)
-        futil.add_handler(palette.navigatingURL, palette_navigating)
-        futil.add_handler(palette.incomingFromHTML, palette_incoming)
-        futil.log(f'{CMD_NAME}: Created a new palette: ID = {palette.id}, Name = {palette.name}')
-
-    if palette.dockingState == adsk.core.PaletteDockingStates.PaletteDockStateFloating:
-        palette.dockingState = PALETTE_DOCKING
-
-    palette.isVisible = True
-
+    createPalette()
 
 # Use this to handle a user closing your palette.
 def palette_closed(args: adsk.core.UserInterfaceGeneralEventArgs):
@@ -200,19 +189,10 @@ def palette_incoming(html_args: adsk.core.HTMLEventArgs):
             lang = 'en-US'
 
         # https://cortyuming.hateblo.jp/entry/20140920/p2
-        html_args.returnData = json.dumps(button_Dict[lang], ensure_ascii=False)#, encoding='utf8')
+        html_args.returnData = json.dumps(button_Dict[lang], ensure_ascii=False)
     else:
         setTreeFolderVisible(KEYMAP[message_action], message_data['value'])
 
-
-
-    # if message_action == 'originShow':
-    #     setTreeFolderVisible("rOriginWorkGeometry", True)
-    # elif message_action == 'originHide':
-    #     setTreeFolderVisible("rOriginWorkGeometry", False)
-    # dd = message_data['value']
-    # ss=KEYMAP[message_action]
-    
 
 # This event handler is called when the command terminates.
 def command_destroy(args: adsk.core.CommandEventArgs):
@@ -223,158 +203,29 @@ def command_destroy(args: adsk.core.CommandEventArgs):
     local_handlers = []
 
 
-# *********************
-# Tree Folder Visible
-def setTreeFolderVisible(key: str, value: bool):
-
-    def getVisualAnalysesPaths() -> str:
-        app: adsk.core.Application = adsk.core.Application.get()
-        rootOccId = app.executeTextCommand(u'PEntity.ID rootInstance')
-        rootComp = getPorpsKey(rootOccId, "rTargetComponent")
-        analysesId = app.executeTextCommand(u'PEntity.ID VisualAnalyses')
-
-        return f'{rootOccId}:{rootComp["entityId"]}:{analysesId}'
-
-    def getIdsPaths() -> list:
-        occPaths = getOccPaths()
-        compIds = getTargetComponentIds(occPaths)
-        originIds = getPorpsKeyIds(compIds, key)
-
-        pathsLst = []
-        for lst in zip(occPaths, compIds, originIds):
-            pathsLst.append(':'.join(lst))
-
-        return pathsLst
-    # ************
-
-    app: adsk.core.Application = adsk.core.Application.get()
-    sels: adsk.core.Selections = app.userInterface.activeSelections
-    sels.clear()
-
-    ents: list = []
-    if key == "VisualAnalyses":
-        ents.append(getVisualAnalysesPaths())
-    else:
-        ents = getIdsPaths()
-
-    ents = [paths for paths in ents if isVisible(paths) != value]
-    if len(ents) < 1:
-        return
-
-    for paths in ents:
-        try:
-            app.executeTextCommand(u'Selections.Add {}'.format(paths))
-        except:
-            pass
-
-    app.executeTextCommand(u'Commands.Start VisibilityToggleCmd')
-    sels.clear()
-
-# ****************
-def isVisible(paths) -> bool:
-    try:
-        props = getPorps(paths)
-        for visible_Key in ("isVisible", "visible"):
-            if not visible_Key in props:
-                continue
-            return getPorpsKey(paths, visible_Key)
-
-    except:
-        return False
-    # "isVisible", "visible" 以外はNone = Falseを返すが良いのか?
-
-
-def getTargetComponentIds(lst) -> list:
-    return getPorpsKeyIds(lst, "rTargetComponent")
-
-
-def getPorpsKeyIds(lst, key) -> list:
-    idsLst = []
-    for paths in lst:
-        try:
-            res = getPorpsKey(paths, key)
-            idsLst.append(str(res['entityId']))
-        except:
-            idsLst.append('-1')
-
-    return idsLst
-
-
-def getPorpsKey(paths, key = '') -> str:
-    app: adsk.core.Application = adsk.core.Application.get()
-
-    try:
-        id = paths.split(':')[-1]
-
-        props = getPorps(paths)
-        return props[key]
-    except:
-        return '-1'
-
-
-def getPorps(paths) -> dict:
-    app: adsk.core.Application = adsk.core.Application.get()
-
-    try:
-        id = paths.split(':')[-1]
-
-        props = json.loads(
-            app.executeTextCommand(u'PEntity.Properties {}'.format(id))
+# *********
+def createPalette():
+    palettes = ui.palettes
+    palette = palettes.itemById(PALETTE_ID)
+    if palette is None:
+        palette = palettes.add(
+            id=PALETTE_ID,
+            name=PALETTE_NAME,
+            htmlFileURL=PALETTE_URL,
+            isVisible=True,
+            showCloseButton=True,
+            isResizable=True,
+            width=400,
+            height=140,
+            useNewWebBrowser=True
         )
+        palette.setPosition(900,200)
+        futil.add_handler(palette.closed, palette_closed)
+        futil.add_handler(palette.navigatingURL, palette_navigating)
+        futil.add_handler(palette.incomingFromHTML, palette_incoming)
+        futil.log(f'{CMD_NAME}: Created a new palette: ID = {palette.id}, Name = {palette.name}')
 
-        return props
-    except:
-        return '-1'
+    if palette.dockingState == adsk.core.PaletteDockingStates.PaletteDockStateFloating:
+        palette.dockingState = PALETTE_DOCKING
 
-
-def getOccPaths() -> list:
-    app: adsk.core.Application = adsk.core.Application.get()
-
-    def getAllOccIds() -> list:
-        app: adsk.core.Application = adsk.core.Application.get()
-        res = app.executeTextCommand(u'PEntity.Properties ComponentInstancesRoot')
-        compInstancesProps = json.loads(res)
-
-        ids = []
-        for info in compInstancesProps["rooted"]:
-            id = info["entityId"]
-            if id < 0:
-                continue
-            ids.append(id)
-
-        return ids
-
-    def getOccFullPaths(id: int):
-        entId = id
-        stackIds = [id]
-        while True:
-            pass
-            prop = getPorpsKey(str(entId), "rParent")
-            if not 'entityId' in prop:
-                break
-            entId = prop['entityId']
-            if entId < 0:
-                break
-            stackIds.append(entId)
-
-        return ':'.join([str(id) for id in stackIds[::-1]])
-
-    # *************
-    occIds = getAllOccIds()
-    pathsLst = [getOccFullPaths(id) for id in occIds]
-    pathsLst.append(
-        str(
-            app.executeTextCommand(u'PEntity.ID rootInstance')
-        )
-    )
-    return pathsLst
-
-
-    # de :anzeigen/ausblenden
-    # en : show/hide
-    # es : mostrar/ocultar
-    # fr : afficher/cacher
-    # it :Mostra/nascondere
-    # jp :表示/非表示
-    # co :보여 주다/숨다
-    # ci :显示/隐藏/
+    palette.isVisible = True

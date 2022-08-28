@@ -1,7 +1,7 @@
 {
     "de-DE": {
-        "Show": "",
-        "Hide": "",
+        "Show": "Anzeigen",
+        "Hide": "Ausblenden",
         "Origin": "Ursprung",
         "Analysis": "Analyse",
         "Joint Origins": "Gelenkursprünge",
@@ -13,8 +13,8 @@
         "Construction": "Konstruktion"
     },
     "en-US": {
-        "Show": "",
-        "Hide": "",
+        "Show": "Show",
+        "Hide": "Hide",
         "Origin": "Origin",
         "Analysis": "Analysis",
         "Joint Origins": "Joint Origins",
@@ -26,8 +26,8 @@
         "Construction": "Construction"
     },
     "es-ES": {
-        "Show": "",
-        "Hide": "",
+        "Show": "Mostrar",
+        "Hide": "Ocultar",
         "Origin": "Origen",
         "Analysis": "Análisis",
         "Joint Origins": "Orígenes de unión",
@@ -39,8 +39,8 @@
         "Construction": "Construcción"
     },
     "fr-FR": {
-        "Show": "",
-        "Hide": "",
+        "Show": "Afficher",
+        "Hide": "Cacher",
         "Origin": "Origine",
         "Analysis": "Analyse",
         "Joint Origins": "Origines de liaison",
@@ -52,8 +52,8 @@
         "Construction": "Construction"
     },
     "it-IT": {
-        "Show": "",
-        "Hide": "",
+        "Show": "Mostra",
+        "Hide": "Nascondere",
         "Origin": "Origine",
         "Analysis": "Analisi",
         "Joint Origins": "Origini del giunto",
@@ -65,8 +65,8 @@
         "Construction": "Costruzione"
     },
     "ja-JP": {
-        "Show": "",
-        "Hide": "",
+        "Show": "表示",
+        "Hide": "非表示",
         "Origin": "原点",
         "Analysis": "解析",
         "Joint Origins": "ジョイントの原点",
@@ -78,8 +78,8 @@
         "Construction": "コンストラクション"
     },
     "ko-KR": {
-        "Show": "",
-        "Hide": "",
+        "Show": "보여 주다",
+        "Hide": "숨다",
         "Origin": "원점",
         "Analysis": "분석",
         "Joint Origins": "접합 원점",
@@ -91,8 +91,8 @@
         "Construction": "구성"
     },
     "zh-CN": {
-        "Show": "",
-        "Hide": "",
+        "Show": "显示",
+        "Hide": "隐藏",
         "Origin": "原点",
         "Analysis": "分析",
         "Joint Origins": "联接原点",
