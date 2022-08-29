@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", () => {
     let adskWaiter = setInterval(() => {
         console.log("DOMContentLoaded");
@@ -64,3 +63,38 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }, 100);
 });
+
+
+function setDisabled(value) {
+    let buttons = document.getElementsByTagName("button");
+    let len = buttons.length;
+    for (let i = 0; i < len; i++){
+        buttons.item(i).disabled = value
+        let a = value
+        let b = 1
+    }
+}
+
+function toBoolean(data) {
+    return data.toLowerCase() === 'true';
+}
+
+window.fusionJavaScriptHandler = {
+    handle: function (action, data) {
+        try {
+            if (action === "command_event") {
+                let values = JSON.parse(data);
+                console.log(values['value']);
+                setDisabled(toBoolean(values["value"]));
+            } else if (action === "debugger") {
+                debugger;
+            } else {
+                return `Unexpected command type: ${action}`;
+            }
+        } catch (e) {
+            console.log(e);
+            console.log(`Exception caught with command: ${action}, data: ${data}`);
+        }
+        return "OK";
+    },
+};

@@ -59,9 +59,25 @@ KEYMAP = {
     "Construction": "rWorkGeometries",
 }
 
+COMMAND_WHITE_LIST = (
+    # 'SelectCommand',
+    'FreeOrbitCommand',
+    'PanCommand',
+    'VisibilityToggleCmd',
+    'FitCommand',
+    'ViewEnvCommand',
+)
+
+_stateProductType = ''
+PRODUCT_TYPE_WHITE_LIST = (
+    'DesignProductType'
+)
+
+_handlers = []
 
 # Executed when add-in is run.
 def start():
+    global ui
     # Create a command Definition.
     cmd_def = ui.commandDefinitions.addButtonDefinition(CMD_ID, CMD_NAME, CMD_Description, ICON_FOLDER)
 
@@ -133,6 +149,17 @@ def command_created(args: adsk.core.CommandCreatedEventArgs):
     futil.add_handler(args.command.execute, command_execute, local_handlers=local_handlers)
     futil.add_handler(args.command.destroy, command_destroy, local_handlers=local_handlers)
 
+    onCommandStarting = MyCommandStartingHandler()
+    ui.commandStarting.add(onCommandStarting)
+    _handlers.append(onCommandStarting)
+
+    # onCommandTerminated = MyCommandTerminatedHandler()
+    # ui.commandStarting.add(onCommandTerminated)
+    # _handlers.append(onCommandTerminated)
+
+    onWorkspacePreActivate = MyWorkspacePreActivateHandler()
+    ui.workspaceActivated.add(onWorkspacePreActivate)
+    _handlers.append(onWorkspacePreActivate)
 
 # Because no command inputs are being added in the command created event, the execute
 # event is immediately fired.
@@ -147,6 +174,8 @@ def palette_closed(args: adsk.core.UserInterfaceGeneralEventArgs):
     # General logging for debug.
     futil.log(f'{CMD_NAME}: Palette was closed.')
 
+    global _handlers
+    _handlers = []
 
 # Use this to handle a user navigating to a new page in your palette.
 def palette_navigating(args: adsk.core.NavigationEventArgs):
@@ -190,9 +219,10 @@ def palette_incoming(html_args: adsk.core.HTMLEventArgs):
 
         # https://cortyuming.hateblo.jp/entry/20140920/p2
         html_args.returnData = json.dumps(button_Dict[lang], ensure_ascii=False)
-    else:
+    elif message_action in KEYMAP:
         setTreeFolderVisible(KEYMAP[message_action], message_data['value'])
-
+    elif message_action == 'response':
+        pass
 
 # This event handler is called when the command terminates.
 def command_destroy(args: adsk.core.CommandEventArgs):
@@ -229,3 +259,60 @@ def createPalette():
         palette.dockingState = PALETTE_DOCKING
 
     palette.isVisible = True
+
+
+class MyCommandStartingHandler(adsk.core.ApplicationCommandEventHandler):
+    def __init__(self):
+        super().__init__()
+    def notify(self, args: adsk.core.ApplicationCommandEventArgs):
+        futil.log(f'{CMD_NAME}: {args.firingEvent.name}')
+
+        global ui
+        palettes = ui.palettes
+        palette = palettes.itemById(PALETTE_ID)
+
+        if not palette:
+            return
+
+        global _stateProductType
+        if not _stateProductType in PRODUCT_TYPE_WHITE_LIST:
+            palette.sendInfoToHTML(
+                'command_event',
+                json.dumps({'value': 'True'}) 
+            )
+        elif args.commandId in COMMAND_WHITE_LIST:
+            palette.sendInfoToHTML(
+                'command_event',
+                json.dumps({'value': 'False'}) 
+            )
+        else:
+            palette.sendInfoToHTML(
+                'command_event',
+                json.dumps({'value': 'True'}) 
+            )
+
+
+# class MyCommandTerminatedHandler(adsk.core.ApplicationCommandEventHandler):
+#     def __init__(self):
+#         super().__init__()
+#     def notify(self, args: adsk.core.ApplicationCommandEventArgs):
+#         futil.log(f'{CMD_NAME}: {args.firingEvent.name}')
+
+#         global ui
+#         palettes = ui.palettes
+#         palette = palettes.itemById(PALETTE_ID)
+
+#         palette.sendInfoToHTML(
+#             'command_event',
+#             json.dumps({'value': 'False'}) 
+#         )
+
+
+class MyWorkspacePreActivateHandler(adsk.core.WorkspaceEventHandler):
+    def __init__(self):
+        super().__init__()
+    def notify(self, args: adsk.core.WorkspaceEventArgs):
+        futil.log(f'{CMD_NAME}: {args.firingEvent.name}')
+
+        global _stateProductType
+        _stateProductType = args.workspace.productType
