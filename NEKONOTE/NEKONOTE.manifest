@@ -6,7 +6,7 @@
 	"description":	{
 		"":	"Show/Hide BrowserTree Folders"
 	},
-	"version":	"0.0.2",
+	"version":	"0.0.3",
 	"runOnStartup":	false,
 	"supportedOS":	"windows|mac",
 	"editEnabled":	true

@@ -220,7 +220,7 @@ def palette_incoming(html_args: adsk.core.HTMLEventArgs):
         # https://cortyuming.hateblo.jp/entry/20140920/p2
         html_args.returnData = json.dumps(button_Dict[lang], ensure_ascii=False)
     elif message_action in KEYMAP:
-        setTreeFolderVisible(KEYMAP[message_action], message_data['value'])
+        setTreeFolderVisible(message_action, message_data['value'])
     elif message_action == 'response':
         pass
 
