@@ -59,16 +59,6 @@ KEYMAP = {
     "Construction": "rWorkGeometries",
 }
 
-COMMAND_WHITE_LIST = (
-    # 'SelectCommand',
-    'FreeOrbitCommand',
-    'PanCommand',
-    'VisibilityToggleCmd',
-    'FitCommand',
-    'ViewEnvCommand',
-)
-
-_stateProductType = ''
 PRODUCT_TYPE_WHITE_LIST = (
     'DesignProductType'
 )
@@ -149,17 +139,9 @@ def command_created(args: adsk.core.CommandCreatedEventArgs):
     futil.add_handler(args.command.execute, command_execute, local_handlers=local_handlers)
     futil.add_handler(args.command.destroy, command_destroy, local_handlers=local_handlers)
 
-    onCommandStarting = MyCommandStartingHandler()
-    ui.commandStarting.add(onCommandStarting)
-    _handlers.append(onCommandStarting)
-
-    # onCommandTerminated = MyCommandTerminatedHandler()
-    # ui.commandStarting.add(onCommandTerminated)
-    # _handlers.append(onCommandTerminated)
-
-    onWorkspacePreActivate = MyWorkspacePreActivateHandler()
-    ui.workspaceActivated.add(onWorkspacePreActivate)
-    _handlers.append(onWorkspacePreActivate)
+    onWorkspaceActivated = MyWorkspaceActivatedHandler()
+    ui.workspaceActivated.add(onWorkspaceActivated)
+    _handlers.append(onWorkspaceActivated)
 
 # Because no command inputs are being added in the command created event, the execute
 # event is immediately fired.
@@ -245,7 +227,7 @@ def createPalette():
             isVisible=True,
             showCloseButton=True,
             isResizable=True,
-            width=400,
+            width=310,
             height=140,
             useNewWebBrowser=True
         )
@@ -261,10 +243,10 @@ def createPalette():
     palette.isVisible = True
 
 
-class MyCommandStartingHandler(adsk.core.ApplicationCommandEventHandler):
+class MyWorkspaceActivatedHandler(adsk.core.WorkspaceEventHandler):
     def __init__(self):
         super().__init__()
-    def notify(self, args: adsk.core.ApplicationCommandEventArgs):
+    def notify(self, args: adsk.core.WorkspaceEventArgs):
         futil.log(f'{CMD_NAME}: {args.firingEvent.name}')
 
         global ui
@@ -274,45 +256,13 @@ class MyCommandStartingHandler(adsk.core.ApplicationCommandEventHandler):
         if not palette:
             return
 
-        global _stateProductType
-        if not _stateProductType in PRODUCT_TYPE_WHITE_LIST:
+        if not args.workspace.productType in PRODUCT_TYPE_WHITE_LIST:
             palette.sendInfoToHTML(
                 'command_event',
                 json.dumps({'value': 'True'}) 
-            )
-        elif args.commandId in COMMAND_WHITE_LIST:
-            palette.sendInfoToHTML(
-                'command_event',
-                json.dumps({'value': 'False'}) 
             )
         else:
             palette.sendInfoToHTML(
                 'command_event',
-                json.dumps({'value': 'True'}) 
+                json.dumps({'value': 'False'}) 
             )
-
-
-# class MyCommandTerminatedHandler(adsk.core.ApplicationCommandEventHandler):
-#     def __init__(self):
-#         super().__init__()
-#     def notify(self, args: adsk.core.ApplicationCommandEventArgs):
-#         futil.log(f'{CMD_NAME}: {args.firingEvent.name}')
-
-#         global ui
-#         palettes = ui.palettes
-#         palette = palettes.itemById(PALETTE_ID)
-
-#         palette.sendInfoToHTML(
-#             'command_event',
-#             json.dumps({'value': 'False'}) 
-#         )
-
-
-class MyWorkspacePreActivateHandler(adsk.core.WorkspaceEventHandler):
-    def __init__(self):
-        super().__init__()
-    def notify(self, args: adsk.core.WorkspaceEventArgs):
-        futil.log(f'{CMD_NAME}: {args.firingEvent.name}')
-
-        global _stateProductType
-        _stateProductType = args.workspace.productType
