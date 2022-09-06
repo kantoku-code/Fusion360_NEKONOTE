@@ -5,51 +5,47 @@ import adsk.fusion
 import adsk.core
 import urllib
 import json
+from ...lib import fusion360utils as futil
+from .enums import Dirname, Scope
 
-# value(onk key, using link occ)
-KEYMAP = {
-    "Component": {
-        'onkKey': "",
-        'linkOcc' : True,
-        },
-    "Origin": {
+DIR_CONTAINER = {
+    Dirname.Origin: {
         'onkKey': "OriginWorkGeometry",
         'linkOcc' : True,
         },
-    "Analysis": {
+    Dirname.Analysis: {
         'onkKey': "VisualAnalyses",
         'linkOcc' : False,
         },
-    "Joint Origins": {
+    Dirname.Joint_Origins: {
         'onkKey': "JointOrigins",
         'linkOcc' : False,
         },
-    "Joints": {
+    Dirname.Joints: {
         'onkKey': "AssyConstraints",
         'linkOcc' : False,
         },
-    "Bodies":{
+    Dirname.Bodies:{
         'onkKey': "Bds",
         'linkOcc' : True,
         },
-    "Canvases":{
+    Dirname.Canvases:{
         'onkKey': "Canvases",
         'linkOcc' : False,
         },
-    "Decals":{
+    Dirname.Decals:{
         'onkKey': "Decals",
         'linkOcc' : False,
         },
-    "Sketches":{
+    Dirname.Sketches:{
         'onkKey': "Sketches",
         'linkOcc' : True,
         },
-    "Construction":{
+    Dirname.Construction:{
         'onkKey': "WorkGeometries",
         'linkOcc' : True,
         },
 }
-
 
 # unit test
 def run(context):
@@ -57,16 +53,21 @@ def run(context):
     try:
         app: adsk.core.Application = adsk.core.Application.get()
         ui = app.userInterface
+        des: adsk.fusion.Design = app.activeProduct
+        root: adsk.fusion.Component = des.rootComponent
 
-        for key in KEYMAP.keys():
-            setTreeFolderVisible(key, False)
+        scope = Scope.ALL
+
+        for key in DIR_CONTAINER.keys():
+            setTreeFolderVisible(key, False, scope)
         # # setAllVisible_Key('', False)
         ui.messageBox('全部消した！')
 
-        for key in KEYMAP.keys():
-            setTreeFolderVisible(key, True)
-        # # setAllVisible_Key('', True)
+        for key in DIR_CONTAINER.keys():
+            setTreeFolderVisible(key, True, scope)
+        # # # setAllVisible_Key('', True)
         ui.messageBox('全部表示した！！')
+
 
     except:
         if ui:
@@ -75,15 +76,21 @@ def run(context):
 
 # Tree Folder Visible
 def setTreeFolderVisible(
-    name: str,
-    visible: bool) -> None:
+    name: Dirname,
+    visible: bool,
+    scope: Scope) -> None:
 
-    info = KEYMAP[name]
+    if not isLightBulbOn_RootComp():
+        return []
+
+    if not scope in Scope:
+        return
+
+    info = DIR_CONTAINER[name]
     onkKey = info['onkKey']
     linkOcc = info['linkOcc']
 
-    # ここでlinkoccでリストを分ける
-    onks = getAllOnk_Key_NotVisible(onkKey, visible, linkOcc)
+    onks = getAllOnk_Key_NotVisible(onkKey, visible, linkOcc, scope)
 
     app: adsk.core.Application = adsk.core.Application.get()
     sels: adsk.core.Selections = app.userInterface.activeSelections
@@ -99,17 +106,18 @@ def setTreeFolderVisible(
 def getAllOnk_Key_NotVisible(
     key: str,
     visible: bool,
-    linkOcc: bool) -> list:
+    linkOcc: bool,
+    scope: Scope,) -> list:
 
-    OccOnks = getAllOccOnk(linkOcc)
+    OccOnks = getAllOccOnk(linkOcc, scope)
     if len(key) < 1:
         onks = OccOnks
     else:
         onks = [f'{o}/{key}' for o in OccOnks]
 
     # Analysisは別扱い
-    fanc = isVisible_VisualAnalyses if key == 'VisualAnalyses' else isVisible_Onk
-    return [onk for onk in onks if fanc(onk) != visible]
+    func = isVisible_VisualAnalyses if key == 'VisualAnalyses' else isVisible_Onk
+    return [onk for onk in onks if func(onk) != visible]
 
 
 def isVisible_VisualAnalyses(
@@ -149,7 +157,6 @@ def isVisible_Onk(
         sels.clear()
 
         app.executeTextCommand(u'Commands.Select {}'.format(onk))
-        # 解析だけ標示判断出来ていない！！
         res = app.executeTextCommand(u'VO.CheckPathVisibility')
         sels.clear()
         value = res.split('.')[0]
@@ -161,31 +168,57 @@ def isVisible_Onk(
 
 
 def getAllOccOnk(
-    linkOcc: bool) -> list:
+    linkOcc: bool,
+    scope: Scope,) -> list:
 
     app: adsk.core.Application = adsk.core.Application.get()
     des: adsk.fusion.Design = app.activeProduct
     root: adsk.fusion.Component = des.rootComponent
 
-    occ_comp_dict: dict = initDict_OccInfo()
-    onks = [
-        getRootOnk()
-    ]
+    occ_comp_dict: dict = initDict_OccInfo(scope)
 
-    if linkOcc:
-        onks.extend(
-            [getOccOnkDict(occ, occ_comp_dict)['onk'] for occ in root.allOccurrences]
-        )
+    onks = []
+    if scope == Scope.ALL:
+        onks.append(getRootOnk())
     else:
-        for occ in root.allOccurrences:
-            info = getOccOnkDict(occ, occ_comp_dict)
-            if info['ref']:
-                continue
-        onks.extend(
-            [info['onk'] for occ in root.allOccurrences]
-        )
+        if des.activeComponent == root:
+            onks.append(getRootOnk())
+        else:
+            occ: adsk.fusion.Occurrence = des.activeOccurrence
 
-    return onks
+            if not occ.isLightBulbOn:
+                return []
+
+            info = getOccOnkDict(occ, occ_comp_dict)
+            if all([not linkOcc, info['ref']]):
+                return []
+
+        if scope == Scope.ACTIVE:
+            return [info['onk']]
+
+    # RootでScope.CHILDRENはALLと同じ
+    if des.activeComponent == root:
+        scope = Scope.ALL
+
+    actOcc: adsk.fusion.Occurrence = des.activeOccurrence
+    for occ in root.allOccurrences:
+        occ: adsk.fusion.Occurrence
+
+        if not occ.isLightBulbOn:
+            continue
+
+        if scope == Scope.CHILDREN:
+            if not (actOcc.name in occ.fullPathName.split('+')):
+                continue
+
+        info = getOccOnkDict(occ, occ_comp_dict)
+
+        if all([not linkOcc, info['ref']]):
+            continue
+
+        onks.append(info['onk'])
+
+    return set(onks)
 
 
 def getOccOnkDict(
@@ -206,14 +239,16 @@ def getOccOnkDict(
             )
         )
         refs.append(occ_comp_dict[path]['ref'])
-    
+
     return {
         'onk': ''.join(onks),
         'ref': any(refs)
     }
 
 
-def initDict_OccInfo() -> dict:
+def initDict_OccInfo(
+    scope: Scope,) -> dict:
+
     app: adsk.core.Application = adsk.core.Application.get()
     des: adsk.fusion.Design = app.activeProduct
     root: adsk.fusion.Component = des.rootComponent
@@ -226,6 +261,16 @@ def initDict_OccInfo() -> dict:
             'ref': occ.isReferencedComponent
         }
 
+    # Scope.CHILDREN用にactiveOccurrenceは参照無しとする
+    if scope != Scope.ALL:
+        actOcc: adsk.fusion.Occurrence = des.activeOccurrence
+        futil.log(f'Active Occ Name : {actOcc.name}')
+        if actOcc:
+            paths = actOcc.fullPathName.split('+')
+            idx = paths.index(actOcc.name)
+            for key in paths[:idx + 1]:
+                dict[key]['ref'] = False
+
     return dict
 
 
@@ -237,6 +282,22 @@ def getRootOnk(
         des = app.activeProduct
 
     root: adsk.fusion.Component = des.rootComponent
-    return ''.join(
-        f'ONK::CmpInst={urllib.parse.quote(root.name)}/Cmp={urllib.parse.quote(root.name)}'
-    )
+    return ''.join([
+        f'ONK::CmpInst={urllib.parse.quote(root.name)}',
+        f'/Cmp={urllib.parse.quote(root.name)}'
+    ])
+
+
+def isLightBulbOn_RootComp():
+    app: adsk.core.Application = adsk.core.Application.get()
+
+    sels: adsk.core.Selections = app.userInterface.activeSelections
+    sels.clear()
+
+    root: adsk.fusion.Component = app.activeProduct.rootComponent
+    sels.add(root)
+
+    res = app.executeTextCommand(u'VO.CheckPathVisibility')
+    sels.clear()
+
+    return res.split('.')[0].upper() == 'TRUE'
