@@ -5,7 +5,6 @@ import adsk.fusion
 import adsk.core
 import urllib
 import json
-from ...lib import fusion360utils as futil
 from .enums import Dirname, Scope
 
 DIR_CONTAINER = {
@@ -183,6 +182,8 @@ def getAllOccOnk(
     else:
         if des.activeComponent == root:
             onks.append(getRootOnk())
+            if scope == Scope.ACTIVE:
+                return set(onks)
         else:
             occ: adsk.fusion.Occurrence = des.activeOccurrence
 
@@ -193,8 +194,9 @@ def getAllOccOnk(
             if all([not linkOcc, info['ref']]):
                 return []
 
-        if scope == Scope.ACTIVE:
-            return [info['onk']]
+            onks.append(info['onk'])
+            if scope == Scope.ACTIVE:
+                return set(onks)
 
     # RootでScope.CHILDRENはALLと同じ
     if des.activeComponent == root:
@@ -264,7 +266,6 @@ def initDict_OccInfo(
     # Scope.CHILDREN用にactiveOccurrenceは参照無しとする
     if scope != Scope.ALL:
         actOcc: adsk.fusion.Occurrence = des.activeOccurrence
-        futil.log(f'Active Occ Name : {actOcc.name}')
         if actOcc:
             paths = actOcc.fullPathName.split('+')
             idx = paths.index(actOcc.name)
