@@ -5,6 +5,7 @@ import adsk.fusion
 import adsk.core
 import urllib
 import json
+from ...lib import fusion360utils as futil
 from .enums import Dirname, Scope
 
 DIR_CONTAINER = {
@@ -263,6 +264,7 @@ def initDict_OccInfo(
     # Scope.CHILDREN用にactiveOccurrenceは参照無しとする
     if scope != Scope.ALL:
         actOcc: adsk.fusion.Occurrence = des.activeOccurrence
+        futil.log(f'Active Occ Name : {actOcc.name}')
         if actOcc:
             paths = actOcc.fullPathName.split('+')
             idx = paths.index(actOcc.name)
