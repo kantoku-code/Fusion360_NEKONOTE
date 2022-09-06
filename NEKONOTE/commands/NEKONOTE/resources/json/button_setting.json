@@ -1,7 +1,11 @@
 {
     "de-DE": {
+        "jp": "ドイツ語",
         "Show": "Anzeigen",
         "Hide": "Ausblenden",
+        "All": "Alle",
+        "Active": "Aktiv",
+        "Children": "Einschließlich Kinder",
         "Origin": "Ursprung",
         "Analysis": "Analyse",
         "Joint Origins": "Gelenkursprünge",
@@ -13,8 +17,12 @@
         "Construction": "Konstruktion"
     },
     "en-US": {
+        "jp": "英語",
         "Show": "Show",
         "Hide": "Hide",
+        "All": "Overall",
+        "Active": "Active",
+        "Children": "Including children",
         "Origin": "Origin",
         "Analysis": "Analysis",
         "Joint Origins": "Joint Origins",
@@ -26,8 +34,12 @@
         "Construction": "Construction"
     },
     "es-ES": {
+        "jp": "スペイン語",
         "Show": "Mostrar",
         "Hide": "Ocultar",
+        "All": "Todo",
+        "Active": "Activo",
+        "Children": "Incluyendo a los niños",
         "Origin": "Origen",
         "Analysis": "Análisis",
         "Joint Origins": "Orígenes de unión",
@@ -39,8 +51,12 @@
         "Construction": "Construcción"
     },
     "fr-FR": {
+        "jp": "フランス語",
         "Show": "Afficher",
         "Hide": "Cacher",
+        "All": "Tous",
+        "Active": "Actif",
+        "Children": "Y compris les enfants",
         "Origin": "Origine",
         "Analysis": "Analyse",
         "Joint Origins": "Origines de liaison",
@@ -52,8 +68,12 @@
         "Construction": "Construction"
     },
     "it-IT": {
+        "jp": "イタリア語",
         "Show": "Mostra",
         "Hide": "Nascondere",
+        "All": "Tutti",
+        "Active": "Attivo",
+        "Children": "Compresi i bambini",
         "Origin": "Origine",
         "Analysis": "Analisi",
         "Joint Origins": "Origini del giunto",
@@ -65,8 +85,12 @@
         "Construction": "Costruzione"
     },
     "ja-JP": {
+        "jp": "日本語",
         "Show": "表示",
         "Hide": "非表示",
+        "All": "全体",
+        "Active": "アクティブ",
+        "Children": "子も含む",
         "Origin": "原点",
         "Analysis": "解析",
         "Joint Origins": "ジョイントの原点",
@@ -78,8 +102,12 @@
         "Construction": "コンストラクション"
     },
     "ko-KR": {
+        "jp": "韓国語",
         "Show": "보여 주다",
         "Hide": "숨다",
+        "All": "모두",
+        "Active": "액티브",
+        "Children": "어린이도 포함",
         "Origin": "원점",
         "Analysis": "분석",
         "Joint Origins": "접합 원점",
@@ -91,8 +119,12 @@
         "Construction": "구성"
     },
     "zh-CN": {
+        "jp": "中国語",
         "Show": "显示",
         "Hide": "隐藏",
+        "All": "全部",
+        "Active": "活跃",
+        "Children": "包括儿童",
         "Origin": "原点",
         "Analysis": "分析",
         "Joint Origins": "联接原点",
