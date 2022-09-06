@@ -47,16 +47,24 @@ local_handlers = []
 THIS_DIR = pathlib.Path(__file__).resolve().parent
 BUTTONSETTING = str(THIS_DIR / 'button_setting.json')
 
-KEYMAP = {
-    "Origin": "rOriginWorkGeometry",
-    "Analysis": "VisualAnalyses",
-    "Joint Origins": "rJointOrigins",
-    "Joints": "rAssyConstraints",
-    "Bodies": "rBodies",
-    "Canvases": "rCanvases",
-    "Decals": "rDecalPatches",
-    "Sketches": "rSketches",
-    "Construction": "rWorkGeometries",
+from .enums import Dirname, Scope
+
+DIR_MAP = {
+    "Origin": Dirname.Origin,
+    "Analysis": Dirname.Analysis,
+    "Joint Origins": Dirname.Joint_Origins,
+    "Joints": Dirname.Joints,
+    "Bodies": Dirname.Bodies,
+    "Canvases": Dirname.Canvases,
+    "Decals": Dirname.Decals,
+    "Sketches": Dirname.Sketches,
+    "Construction": Dirname.Construction,
+}
+
+SCOPE_MAP = {
+    'ALL' : Scope.ALL,
+    'ACTIVE' : Scope.ACTIVE,
+    'CHILDREN' : Scope.CHILDREN,
 }
 
 PRODUCT_TYPE_WHITE_LIST = (
@@ -201,8 +209,13 @@ def palette_incoming(html_args: adsk.core.HTMLEventArgs):
 
         # https://cortyuming.hateblo.jp/entry/20140920/p2
         html_args.returnData = json.dumps(button_Dict[lang], ensure_ascii=False)
-    elif message_action in KEYMAP:
-        setTreeFolderVisible(message_action, message_data['value'])
+    elif message_action in DIR_MAP:
+        setTreeFolderVisible(
+            DIR_MAP[message_action],
+            message_data['value'],
+            SCOPE_MAP[message_data['scope']],
+            # Scope.ALL#TEST
+            )
     elif message_action == 'response':
         pass
 
@@ -228,7 +241,7 @@ def createPalette():
             showCloseButton=True,
             isResizable=True,
             width=310,
-            height=140,
+            height=160,
             useNewWebBrowser=True
         )
         palette.setPosition(900,200)
