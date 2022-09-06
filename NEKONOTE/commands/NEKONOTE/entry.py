@@ -6,8 +6,11 @@ from ...lib import fusion360utils as futil
 from ... import config
 from .show_hide_factry import setTreeFolderVisible
 
+THIS_DIR = pathlib.Path(__file__).resolve().parent
+
 app = adsk.core.Application.get()
 ui = app.userInterface
+
 
 # TODO ********************* Change these names *********************
 CMD_ID = f'{config.COMPANY_NAME}_{config.ADDIN_NAME}_nekonote'
@@ -21,13 +24,13 @@ PALETTE_ID = config.sample_palette_id
 
 # Specify the full path to the local html. You can also use a web URL
 # such as 'https://www.autodesk.com/'
-PALETTE_URL = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', 'html', 'index.html')
+PALETTE_URL = str(THIS_DIR / 'resources' / 'html' / 'index.html')
 
 # The path function builds a valid OS path. This fixes it to be a valid local URL.
 PALETTE_URL = PALETTE_URL.replace('\\', '/')
 
 # Set a default docking behavior for the palette
-PALETTE_DOCKING = adsk.core.PaletteDockingStates.PaletteDockStateFloating #adsk.core.PaletteDockingStates.PaletteDockStateRight
+PALETTE_DOCKING = adsk.core.PaletteDockingStates.PaletteDockStateFloating
 
 # TODO *** Define the location where the command button will be created. ***
 # This is done by specifying the workspace, the tab, and the panel, and the 
@@ -38,14 +41,13 @@ PANEL_ID = 'UtilityPanel'
 COMMAND_BESIDE_ID = 'FusionComputeAllCommand'
 
 # Resource location for command icons, here we assume a sub folder in this directory named "resources".
-ICON_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'resources', '')
+ICON_FOLDER = str(THIS_DIR / 'resources' / 'icon')
 
 # Local list of event handlers used to maintain a reference so
 # they are not released and garbage collected.
 local_handlers = []
 
-THIS_DIR = pathlib.Path(__file__).resolve().parent
-BUTTONSETTING = str(THIS_DIR / 'button_setting.json')
+BUTTONSETTING = str(THIS_DIR / 'resources' / 'json' / 'button_setting.json')
 
 from .enums import Dirname, Scope
 
