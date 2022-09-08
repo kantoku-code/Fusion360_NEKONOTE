@@ -1,10 +1,11 @@
 import json
 import adsk.core
-import os
+# import os
 import pathlib
 from ...lib import fusion360utils as futil
 from ... import config
 from .show_hide_factry import setTreeFolderVisible
+from .enums import Dirname, Scope
 
 THIS_DIR = pathlib.Path(__file__).resolve().parent
 
@@ -49,8 +50,6 @@ local_handlers = []
 
 BUTTONSETTING = str(THIS_DIR / 'resources' / 'json' / 'button_setting.json')
 
-from .enums import Dirname, Scope
-
 DIR_MAP = {
     "Origin": Dirname.Origin,
     "Analysis": Dirname.Analysis,
@@ -74,6 +73,21 @@ PRODUCT_TYPE_WHITE_LIST = (
 )
 
 _handlers = []
+
+# ** debug **
+DEBUG_LANG_MODE = False
+LANGS = [
+    "de-DE",
+    "en-US",
+    "es-ES",
+    "fr-FR",
+    "it-IT",
+    "ja-JP",
+    "ko-KR",
+    "zh-CN",
+]
+DEBUG_LANG = LANGS[0]
+# ********
 
 # Executed when add-in is run.
 def start():
@@ -209,6 +223,10 @@ def palette_incoming(html_args: adsk.core.HTMLEventArgs):
         if not lang in button_Dict:
             lang = 'en-US'
 
+        # **debug **
+        if DEBUG_LANG_MODE:
+            lang = DEBUG_LANG
+
         # https://cortyuming.hateblo.jp/entry/20140920/p2
         html_args.returnData = json.dumps(button_Dict[lang], ensure_ascii=False)
     elif message_action in DIR_MAP:
@@ -216,7 +234,6 @@ def palette_incoming(html_args: adsk.core.HTMLEventArgs):
             DIR_MAP[message_action],
             message_data['value'],
             SCOPE_MAP[message_data['scope']],
-            # Scope.ALL#TEST
             )
     elif message_action == 'response':
         pass

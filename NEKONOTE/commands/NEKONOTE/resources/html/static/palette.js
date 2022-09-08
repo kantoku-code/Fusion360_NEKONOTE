@@ -25,8 +25,7 @@ const BTN_ICONS = {
     "Construction": '<i class="bi bi-square"></i>',
 };
 
-const SCOPE_ALL_ID = "scope_all";
-const SCOPE_ACTIVE_ID = "scope_active";
+const SCOPE_SWITCH_ID = "scope_switch";
 const SCOPE_CHILDREN_ID = "scope_children";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -47,25 +46,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 const row = init_Buttons(button_info);
                 button_group.appendChild(row);
 
-                // スコープ多言語化していない
-                // scope all
-                const scope_all = initRadio(SCOPE_ALL_ID, "全体", button_group);
-                scope_all.checked=true;
-                scope_all.addEventListener(`change`, function(){
-                    let checkbox = document.getElementById(SCOPE_CHILDREN_ID)
-                    checkbox.disabled = scope_all.checked
-                });
-
-                // scope active
-                const scope_active = initRadio(SCOPE_ACTIVE_ID, "アクティブ", button_group);
-                scope_active.addEventListener(`change`, function(){
-                    let checkbox = document.getElementById(SCOPE_CHILDREN_ID)
-                    checkbox.disabled = !scope_active.checked
-                });
+                const scope_switch = initSwitch(
+                    SCOPE_SWITCH_ID,
+                    button_info["Active"],
+                    button_info["All"] + "/" + button_info["Active"],
+                    button_group
+                );
 
                 // scope children
-                const scope_children = initCheck(SCOPE_CHILDREN_ID, "子も含む", button_group)
-                scope_children.checked = true
+                const scope_children = initCheck(
+                    SCOPE_CHILDREN_ID,
+                    button_info["Children"],
+                    button_group);
+                scope_children.checked = true;
+
+                const xxx = initSelect(
+                    "kkk",
+                    button_group,
+                    ["1","2","3"]
+                )
+
             });
         }
     }, 100);
@@ -77,7 +77,7 @@ window.fusionJavaScriptHandler = {
             if (action === "command_event") {
                 let values = JSON.parse(data);
                 dumpLog(values['value']);
-                setDisabled(toBoolean(values["value"]));
+                setDisabledByButton(toBoolean(values["value"]), "button");
             } else if (action === "debugger") {
                 debugger;
             } else {
@@ -129,37 +129,45 @@ function init_Buttons(button_info) {
     return row;
 }
 
-function initRadio(id, text, parent) {
+function initSwitch(id, text, tooltip, parent) {
     // div
-    const div_scope = document.createElement("div");
-    div_scope.setAttribute("class", "form-check form-check-inline");
-    div_scope.setAttribute("id", id + "div");
-    parent.appendChild(div_scope);
+    const scope_div = document.createElement("div");
+    scope_div.setAttribute("class", "form-check form-switch form-check-inline");
+    scope_div.setAttribute("data-bs-toggle", "tooltip");
+    scope_div.setAttribute("data-bs-placement", "top");
+    scope_div.setAttribute("title", tooltip);
 
-    // radio
-    const scope_radio = document.createElement("input");
-    scope_radio.setAttribute("class", "form-check-input");
-    scope_radio.setAttribute("type", "radio");
-    scope_radio.setAttribute("name", "flexRadioScope");
-    scope_radio.setAttribute("id", id);
-    div_scope.appendChild(scope_radio);
+    parent.appendChild(scope_div);
+
+    // input
+    const scope_input = document.createElement("input");
+    scope_input.setAttribute("class", "form-check-input");
+    scope_input.type = "checkbox";
+    scope_input.id = id;
+    scope_input.addEventListener('change',function(){
+        setDisabledById(!scope_input.checked, SCOPE_CHILDREN_ID);
+    });
+    scope_div.appendChild(scope_input);
 
     // label
     const scope_label = document.createElement("label");
     scope_label.setAttribute("class", "form-check-label");
-    scope_label.setAttribute("for", id);
-    scope_label.appendChild(document.createTextNode(text));
-    div_scope.appendChild(scope_label);
+    scope_label.for = id;
+    scope_label.textContent = text
+    scope_div.appendChild(scope_label);
 
-    return scope_radio
+    return scope_input
 }
 
 function initCheck(id, text, parent) {
     // div
-    const div_scope = document.createElement("div");
-    div_scope.setAttribute("class", "form-check form-check-inline");
-    div_scope.setAttribute("id", id + "div");
-    parent.appendChild(div_scope);
+    const scope_div = document.createElement("div");
+    scope_div.setAttribute("class", "form-check form-check-inline");
+    scope_div.setAttribute("id", id + "div");
+    scope_div.setAttribute("data-bs-toggle", "tooltip");
+    scope_div.setAttribute("data-bs-placement", "top");
+    scope_div.setAttribute("title", text);
+    parent.appendChild(scope_div);
 
     // checkbox
     const scope_children = document.createElement("input");
@@ -168,20 +176,32 @@ function initCheck(id, text, parent) {
     scope_children.setAttribute("type", "checkbox");
     scope_children.setAttribute("value", "");
     scope_children.setAttribute("disabled", "true");
-    div_scope.appendChild(scope_children);
+    scope_div.appendChild(scope_children);
 
     // label
     const label_children = document.createElement("label");
     label_children.setAttribute("class", "form-check-label");
     label_children.setAttribute("for", id);
-    label_children.appendChild(document.createTextNode(text));
-    div_scope.appendChild(label_children);
+    label_children.innerHTML = '<i class="bi bi-diagram-3"></i>'
+    // label_children.appendChild(document.createTextNode(text));
+    scope_div.appendChild(label_children);
 
     return scope_children
 }
 
 function getScopeValue() {
-    const scope_active = document.getElementById(SCOPE_ACTIVE_ID)
+    // const scope_active = document.getElementById(SCOPE_ACTIVE_ID)
+    // if (scope_active.checked) {
+    //     const scope_children = document.getElementById(SCOPE_CHILDREN_ID)
+    //     if (scope_children.checked) {
+    //         return "CHILDREN"
+    //     } else {
+    //         return "ACTIVE"
+    //     }
+    // } else {
+    //     return "ALL"
+    // }
+    const scope_active = document.getElementById(SCOPE_SWITCH_ID)
     if (scope_active.checked) {
         const scope_children = document.getElementById(SCOPE_CHILDREN_ID)
         if (scope_children.checked) {
@@ -194,12 +214,17 @@ function getScopeValue() {
     }
 }
 
-function setDisabled(value) {
+function setDisabledByButton(value) {
     let buttons = document.getElementsByTagName("button");
     let len = buttons.length;
     for (let i = 0; i < len; i++){
         buttons.item(i).disabled = value
     }
+}
+
+function setDisabledById(value, id) {
+    let elem = document.getElementById(id);
+    elem.disabled = value
 }
 
 function toBoolean(data) {
