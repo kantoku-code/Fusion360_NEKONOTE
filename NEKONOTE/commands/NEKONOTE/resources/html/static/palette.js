@@ -60,11 +60,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     button_group);
                 scope_children.checked = true;
 
-                const xxx = initSelect(
-                    "kkk",
-                    button_group,
-                    ["1","2","3"]
-                )
+                // const xxx = initSelect(
+                //     "kkk",
+                //     button_group,
+                //     ["1","2","3"]
+                // )
 
             });
         }
@@ -90,6 +90,13 @@ window.fusionJavaScriptHandler = {
         return "OK";
     },
 };
+
+function init_modal(params) {
+    
+}
+
+
+
 
 function init_Buttons(button_info) {
     // div
@@ -183,24 +190,12 @@ function initCheck(id, text, parent) {
     label_children.setAttribute("class", "form-check-label");
     label_children.setAttribute("for", id);
     label_children.innerHTML = '<i class="bi bi-diagram-3"></i>'
-    // label_children.appendChild(document.createTextNode(text));
     scope_div.appendChild(label_children);
 
     return scope_children
 }
 
 function getScopeValue() {
-    // const scope_active = document.getElementById(SCOPE_ACTIVE_ID)
-    // if (scope_active.checked) {
-    //     const scope_children = document.getElementById(SCOPE_CHILDREN_ID)
-    //     if (scope_children.checked) {
-    //         return "CHILDREN"
-    //     } else {
-    //         return "ACTIVE"
-    //     }
-    // } else {
-    //     return "ALL"
-    // }
     const scope_active = document.getElementById(SCOPE_SWITCH_ID)
     if (scope_active.checked) {
         const scope_children = document.getElementById(SCOPE_CHILDREN_ID)
