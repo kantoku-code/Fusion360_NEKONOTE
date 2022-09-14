@@ -7,11 +7,25 @@ from ... import config
 from .show_hide_factry import setTreeFolderVisible
 from .enums import Dirname, Scope
 
+
+# ** debug **
+DEBUG_LANG_MODE = False
+LANGS = [
+    "de-DE",
+    "en-US",
+    "es-ES",
+    "fr-FR",
+    "it-IT",
+    "ja-JP",
+    "ko-KR",
+    "zh-CN",
+]
+DEBUG_LANG = LANGS[6]
+
 THIS_DIR = pathlib.Path(__file__).resolve().parent
 
 app = adsk.core.Application.get()
 ui = app.userInterface
-
 
 # TODO ********************* Change these names *********************
 CMD_ID = f'{config.COMPANY_NAME}_{config.ADDIN_NAME}_nekonote'
@@ -73,20 +87,6 @@ PRODUCT_TYPE_WHITE_LIST = (
 )
 
 _handlers = []
-
-# ** debug **
-DEBUG_LANG_MODE = False
-LANGS = [
-    "de-DE",
-    "en-US",
-    "es-ES",
-    "fr-FR",
-    "it-IT",
-    "ja-JP",
-    "ko-KR",
-    "zh-CN",
-]
-DEBUG_LANG = LANGS[0]
 
 PALETTE_HEIGHT_NORMAL = 170
 PALETTE_HEIGHT_OPTION = 350
@@ -240,6 +240,12 @@ def palette_incoming(html_args: adsk.core.HTMLEventArgs):
             message_data['value'],
             SCOPE_MAP[message_data['scope']],
             )
+
+    elif message_action == 'option':
+        global ui
+        palette: adsk.core.Palette = ui.palettes.itemById(PALETTE_ID)
+        palette.height = PALETTE_HEIGHT_OPTION if message_data['value'] else PALETTE_HEIGHT_NORMAL
+
     elif message_action == 'response':
         pass
 

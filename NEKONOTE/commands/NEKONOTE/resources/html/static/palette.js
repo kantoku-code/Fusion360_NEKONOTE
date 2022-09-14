@@ -1,6 +1,6 @@
 // fusion360 api
 
-const DEBUG = true
+const DEBUG = false;
 
 const SHOW_HIDE_INFO = {
     "Show" : {
@@ -37,7 +37,7 @@ const BTN_VISIBLE = {
     "Construction": true,
 };
 
-let BUTTON_INFO = ""
+let BUTTON_INFO = "";
 
 const SCOPE_SWITCH_ID = "scope_switch";
 const SCOPE_CHILDREN_ID = "scope_children";
@@ -68,23 +68,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
 
                 // scope
-                // const scope_div = document.getElementById("scope_option");
-                // const scope_row2 = document.createElement("div");
-                // scope_row2.setAttribute("class", "row g-2");
-                // scope_div.appendChild(scope_row2)
-
-                // const scope_row = document.createElement("div");
-                // scope_row.setAttribute("class", "btn-group btn-group-sm"); //"row g-1");
-                // scope_row.setAttribute("role", "group");
-                // scope_row.setAttribute("aria-label", "First group");
-                // scope_row2.appendChild(scope_row)
-
-
                 const scope_switch = initSwitch(
                     SCOPE_SWITCH_ID,
                     BUTTON_INFO["Active"],
                     BUTTON_INFO["All"] + "/" + BUTTON_INFO["Active"],
-                    // scope_row
                     button_group
                 );
 
@@ -92,7 +79,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 const scope_children = initCheck(
                     SCOPE_CHILDREN_ID,
                     BUTTON_INFO["Children"],
-                    // scope_row
                     button_group
                 );
                 scope_children.checked = true;
@@ -100,7 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 // modal
                 init_Modal(
                     BUTTON_INFO,
-                    // scope_row
                     button_group
                 );
 
@@ -137,7 +122,13 @@ function init_Modal(button_info, parent) {
     btn.setAttribute("data-bs-toggle", "modal");
     btn.setAttribute("data-bs-target", "#staticBackdrop");
     btn.innerHTML = '<i class="bi bi-gear"></i>';
-    parent.appendChild(btn)
+    btn.addEventListener('click',function(){
+        let args = {
+            value: true
+        };
+        adsk.fusionSendData('option', JSON.stringify(args));
+    });
+    parent.appendChild(btn);
 
     // modal
     const modal_fade = document.createElement("div");
@@ -164,7 +155,7 @@ function init_Modal(button_info, parent) {
     const modal_title = document.createElement("h5");
     modal_title.setAttribute("class", "modal-title");
     modal_title.setAttribute("id", "staticBackdropLabel");
-    modal_title.innerText = "TITLE"
+    modal_title.innerText = button_info["Show"] + "/" + button_info["Hide"]
     modal_header.appendChild(modal_title);
 
     const modal_close = document.createElement("button");
@@ -176,6 +167,10 @@ function init_Modal(button_info, parent) {
         const button_group = document.getElementById("buttons");
         button_group.innerHTML = "";
         init_Buttons(button_info, button_group);
+        let args = {
+            value: false
+        };
+        adsk.fusionSendData('option', JSON.stringify(args));
     });
     modal_header.appendChild(modal_close);
 
@@ -192,7 +187,7 @@ function setButtonVisible() {
     for (const key in BTN_ICONS) {
         let elem = document.getElementById("option" + key);
         BTN_VISIBLE[key] = elem.checked;
-    }
+    };
 };
 
 function initOptionChecks(button_info, parent) {
@@ -201,10 +196,6 @@ function initOptionChecks(button_info, parent) {
         // div
         const scope_div = document.createElement("div");
         scope_div.setAttribute("class", "form-check form-check-inline");
-        // scope_div.setAttribute("id", id + "div");
-        // scope_div.setAttribute("data-bs-toggle", "tooltip");
-        // scope_div.setAttribute("data-bs-placement", "top");
-        // scope_div.setAttribute("title", key);
         parent.appendChild(scope_div);
 
         // checkbox
@@ -258,8 +249,6 @@ function init_Buttons(button_info, parent) {
         };
         parent.appendChild(btnGrp);
     };
-
-    // parent.appendChild(row);
 };
 
 function initSwitch(id, text, tooltip, parent) {
