@@ -87,6 +87,11 @@ LANGS = [
     "zh-CN",
 ]
 DEBUG_LANG = LANGS[0]
+
+PALETTE_HEIGHT_NORMAL = 170
+PALETTE_HEIGHT_OPTION = 350
+
+
 # ********
 
 # Executed when add-in is run.
@@ -260,7 +265,7 @@ def createPalette():
             showCloseButton=True,
             isResizable=True,
             width=310,
-            height=170,
+            height=PALETTE_HEIGHT_NORMAL,
             useNewWebBrowser=True
         )
         palette.setPosition(900,200)

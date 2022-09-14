@@ -25,6 +25,20 @@ const BTN_ICONS = {
     "Construction": '<i class="bi bi-square"></i>',
 };
 
+const BTN_VISIBLE = {
+    "Origin": true,
+    "Analysis": true,
+    "Joint Origins": true,
+    "Joints": true,
+    "Bodies": true,
+    "Canvases": true,
+    "Decals": true,
+    "Sketches": true,
+    "Construction": true,
+};
+
+let BUTTON_INFO = ""
+
 const SCOPE_SWITCH_ID = "scope_switch";
 const SCOPE_CHILDREN_ID = "scope_children";
 
@@ -40,34 +54,55 @@ document.addEventListener("DOMContentLoaded", () => {
             .then((data) => {
                 const button_group = document.getElementById("button_group");
                 dumpLog(data)
-                let button_info = JSON.parse(data)
+                BUTTON_INFO = JSON.parse(data)
 
                 // button
-                const row = init_Buttons(button_info);
-                button_group.appendChild(row);
+                const buttons = document.createElement("div");
+                buttons.setAttribute("class", "row g-1");
+                buttons.setAttribute("id", "buttons");
+                button_group.appendChild(buttons)
 
-                const scope_div = document.createElement("div")
-                button_group.appendChild(scope_div);
+                init_Buttons(
+                    BUTTON_INFO,
+                    buttons
+                );
+
+                // scope
+                // const scope_div = document.getElementById("scope_option");
+                // const scope_row2 = document.createElement("div");
+                // scope_row2.setAttribute("class", "row g-2");
+                // scope_div.appendChild(scope_row2)
+
+                // const scope_row = document.createElement("div");
+                // scope_row.setAttribute("class", "btn-group btn-group-sm"); //"row g-1");
+                // scope_row.setAttribute("role", "group");
+                // scope_row.setAttribute("aria-label", "First group");
+                // scope_row2.appendChild(scope_row)
+
 
                 const scope_switch = initSwitch(
                     SCOPE_SWITCH_ID,
-                    button_info["Active"],
-                    button_info["All"] + "/" + button_info["Active"],
-                    scope_div 
+                    BUTTON_INFO["Active"],
+                    BUTTON_INFO["All"] + "/" + BUTTON_INFO["Active"],
+                    // scope_row
+                    button_group
                 );
 
                 // scope children
                 const scope_children = initCheck(
                     SCOPE_CHILDREN_ID,
-                    button_info["Children"],
-                    scope_div
+                    BUTTON_INFO["Children"],
+                    // scope_row
+                    button_group
                 );
                 scope_children.checked = true;
 
                 // modal
-                const modal = init_Modal()
-                scope_div.appendChild(modal[0])
-                scope_div.appendChild(modal[1])
+                init_Modal(
+                    BUTTON_INFO,
+                    // scope_row
+                    button_group
+                );
 
             });
         }
@@ -94,13 +129,15 @@ window.fusionJavaScriptHandler = {
     },
 };
 
-function init_Modal() {
+
+function init_Modal(button_info, parent) {
     // button
     const btn = document.createElement("button");
     btn.setAttribute("class", "btn btn-secondary btn-sm customBtn");
     btn.setAttribute("data-bs-toggle", "modal");
     btn.setAttribute("data-bs-target", "#staticBackdrop");
     btn.innerHTML = '<i class="bi bi-gear"></i>';
+    parent.appendChild(btn)
 
     // modal
     const modal_fade = document.createElement("div");
@@ -135,14 +172,10 @@ function init_Modal() {
     modal_close.setAttribute("data-bs-dismiss", "modal");
     modal_close.setAttribute("aria-label", "Close");
     modal_close.addEventListener('click',function(){
-        // const scopeValue = getScopeValue();
-        // let args = {
-        //     value: SHOW_HIDE_INFO[sh]["value"],
-        //     scope: scopeValue
-        // };
-        // adsk.fusionSendData(key, JSON.stringify(args));
-        btn.remove();
-        const a = 1;
+        setButtonVisible();
+        const button_group = document.getElementById("buttons");
+        button_group.innerHTML = "";
+        init_Buttons(button_info, button_group);
     });
     modal_header.appendChild(modal_close);
 
@@ -150,38 +183,28 @@ function init_Modal() {
     modal_body.setAttribute("class", "modal-body");
     modal_content.appendChild(modal_body);
 
-    initOptionChecks(modal_body)
-{/* <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" 
-tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Understood</button>
-      </div>
-    </div>
-  </div>
-</div> */}
-    return [btn, modal_fade]
-}
+    initOptionChecks(button_info, modal_body);
 
-function initOptionChecks(parent) {
-    const id = "option"
+    parent.appendChild(modal_fade);
+};
+
+function setButtonVisible() {
     for (const key in BTN_ICONS) {
+        let elem = document.getElementById("option" + key);
+        BTN_VISIBLE[key] = elem.checked;
+    }
+};
+
+function initOptionChecks(button_info, parent) {
+    for (const key in BTN_ICONS) {
+        const id = "option" + key
         // div
         const scope_div = document.createElement("div");
         scope_div.setAttribute("class", "form-check form-check-inline");
-        scope_div.setAttribute("id", id + "div");
-        scope_div.setAttribute("data-bs-toggle", "tooltip");
-        scope_div.setAttribute("data-bs-placement", "top");
-        scope_div.setAttribute("title", key);
+        // scope_div.setAttribute("id", id + "div");
+        // scope_div.setAttribute("data-bs-toggle", "tooltip");
+        // scope_div.setAttribute("data-bs-placement", "top");
+        // scope_div.setAttribute("title", key);
         parent.appendChild(scope_div);
 
         // checkbox
@@ -197,17 +220,12 @@ function initOptionChecks(parent) {
         const label_children = document.createElement("label");
         label_children.setAttribute("class", "form-check-label");
         label_children.setAttribute("for", id);
-        label_children.innerHTML = key
+        label_children.innerHTML = button_info[key]
         scope_div.appendChild(label_children);
     }
-}
+};
 
-
-function init_Buttons(button_info) {
-    // div
-    const row = document.createElement("div");
-    row.setAttribute("class", "row g-1");
-
+function init_Buttons(button_info, parent) {
     for (const sh in SHOW_HIDE_INFO) {
         // button group
         const btnGrp = document.createElement("div");
@@ -217,6 +235,9 @@ function init_Buttons(button_info) {
 
         // button
         for (const key in BTN_ICONS) {
+            if (!BTN_VISIBLE[key]) {
+                continue;
+            }
             const btn = document.createElement("button");
             btn.setAttribute("class", SHOW_HIDE_INFO[sh]["button"]);
             btn.setAttribute("type", "button");
@@ -235,11 +256,11 @@ function init_Buttons(button_info) {
             });
             btnGrp.appendChild(btn);
         };
-        row.appendChild(btnGrp);
+        parent.appendChild(btnGrp);
     };
 
-    return row;
-}
+    // parent.appendChild(row);
+};
 
 function initSwitch(id, text, tooltip, parent) {
     // div
@@ -269,7 +290,7 @@ function initSwitch(id, text, tooltip, parent) {
     scope_div.appendChild(scope_label);
 
     return scope_input
-}
+};
 
 function initCheck(id, text, parent) {
     // div
@@ -298,7 +319,7 @@ function initCheck(id, text, parent) {
     scope_div.appendChild(label_children);
 
     return scope_children
-}
+};
 
 function getScopeValue() {
     const scope_active = document.getElementById(SCOPE_SWITCH_ID)
@@ -312,27 +333,27 @@ function getScopeValue() {
     } else {
         return "ALL"
     }
-}
+};
 
 function setDisabledByButton(value) {
     let buttons = document.getElementsByTagName("button");
     let len = buttons.length;
     for (let i = 0; i < len; i++){
         buttons.item(i).disabled = value
-    }
-}
+    };
+};
 
 function setDisabledById(value, id) {
     let elem = document.getElementById(id);
-    elem.disabled = value
-}
+    elem.disabled = value;
+};
 
 function toBoolean(data) {
     return data.toLowerCase() === 'true';
-}
+};
 
 function dumpLog(msg) {
     if (DEBUG) {
         console.log(msg);
-    }
-}
+    };
+};
