@@ -260,7 +260,7 @@ def createPalette():
             showCloseButton=True,
             isResizable=True,
             width=310,
-            height=160,
+            height=170,
             useNewWebBrowser=True
         )
         palette.setPosition(900,200)
