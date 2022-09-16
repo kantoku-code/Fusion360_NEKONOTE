@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // scope
                 const scope_option = document.getElementById("scope");
-                const scope_switch = initSwitch(
+                initSwitch(
                     SCOPE_SWITCH_ID,
                     BUTTON_INFO["Active"],
                     BUTTON_INFO["All"] + "/" + BUTTON_INFO["Active"],
@@ -102,6 +102,9 @@ window.fusionJavaScriptHandler = {
                 let values = JSON.parse(data);
                 dumpLog(values['value']);
                 setDisabledByButton(toBoolean(values["value"]), "button");
+                setDisabledById(toBoolean(values["value"]), SCOPE_SWITCH_ID);
+                setDisabledById(toBoolean(values["value"]), SCOPE_CHILDREN_ID);
+
             } else if (action === "debugger") {
                 debugger;
             } else {
@@ -123,6 +126,9 @@ function init_Modal(button_info, parent) {
     btn.setAttribute("class", "btn btn-outline-dark btn-sm customBtn p-0");
     btn.setAttribute("data-bs-toggle", "modal");
     btn.setAttribute("data-bs-target", "#staticBackdrop");
+    // btn.setAttribute("data-bs-toggle", "tooltip");
+    // btn.setAttribute("data-bs-placement", "top");
+    // btn.setAttribute("title", "hoge");
     btn.innerHTML = '<i class="bi bi-gear"></i>';
     btn.addEventListener('click',function(){
         let args = {
@@ -166,7 +172,7 @@ function init_Modal(button_info, parent) {
     modal_close.setAttribute("aria-label", "Close");
     modal_close.addEventListener('click',function(){
         setButtonVisible();
-        const button_group = document.getElementById("buttons");
+        const button_group = document.getElementById("button_group");
         button_group.innerHTML = "";
         init_Buttons(button_info, button_group);
         let args = {

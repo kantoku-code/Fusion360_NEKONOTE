@@ -89,7 +89,7 @@ PRODUCT_TYPE_WHITE_LIST = (
 _handlers = []
 
 PALETTE_WIDTH = 260
-PALETTE_HEIGHT_NORMAL = 170
+PALETTE_HEIGHT_NORMAL = 160
 PALETTE_HEIGHT_OPTION = 340
 
 
@@ -246,6 +246,8 @@ def palette_incoming(html_args: adsk.core.HTMLEventArgs):
         global ui
         palette: adsk.core.Palette = ui.palettes.itemById(PALETTE_ID)
         palette.height = PALETTE_HEIGHT_OPTION if message_data['value'] else PALETTE_HEIGHT_NORMAL
+        if not message_data['value']:
+            palette.width = PALETTE_WIDTH
 
     elif message_action == 'response':
         pass
