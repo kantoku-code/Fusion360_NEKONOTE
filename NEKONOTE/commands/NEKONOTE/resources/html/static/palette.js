@@ -4,11 +4,11 @@ const DEBUG = false;
 
 const SHOW_HIDE_INFO = {
     "Show" : {
-        "button": 'btn btn-primary btn-sm customBtn',
+        "button": 'btn btn-primary btn-sm customBtn p-1',
         "value": true
     },
     "Hide" : {
-        "button": 'btn btn-secondary btn-sm customBtn',
+        "button": 'btn btn-secondary btn-sm customBtn p-1',
         "value": false
     },
 };
@@ -52,43 +52,44 @@ document.addEventListener("DOMContentLoaded", () => {
             adsk
             .fusionSendData("DOMContentLoaded", "{}")
             .then((data) => {
-                const button_group = document.getElementById("button_group");
                 dumpLog(data)
                 BUTTON_INFO = JSON.parse(data)
 
                 // button
-                const buttons = document.createElement("div");
-                buttons.setAttribute("class", "row g-1");
-                buttons.setAttribute("id", "buttons");
-                button_group.appendChild(buttons)
+                const button_group = document.getElementById("button_group");
 
                 init_Buttons(
                     BUTTON_INFO,
-                    buttons
+                    // buttons
+                    button_group
                 );
 
+                // scope_pref
+                const scope_pref = document.getElementById("scope_pref");
+
                 // scope
+                const scope_option = document.getElementById("scope");
                 const scope_switch = initSwitch(
                     SCOPE_SWITCH_ID,
                     BUTTON_INFO["Active"],
                     BUTTON_INFO["All"] + "/" + BUTTON_INFO["Active"],
-                    button_group
+                    scope_option
                 );
 
                 // scope children
                 const scope_children = initCheck(
                     SCOPE_CHILDREN_ID,
                     BUTTON_INFO["Children"],
-                    button_group
+                    scope_option
                 );
                 scope_children.checked = true;
 
                 // modal
+                const pref= document.getElementById("pref");
                 init_Modal(
                     BUTTON_INFO,
-                    button_group
+                    pref
                 );
-
             });
         }
     }, 100);
@@ -116,9 +117,10 @@ window.fusionJavaScriptHandler = {
 
 
 function init_Modal(button_info, parent) {
+
     // button
     const btn = document.createElement("button");
-    btn.setAttribute("class", "btn btn-secondary btn-sm customBtn");
+    btn.setAttribute("class", "btn btn-outline-dark btn-sm customBtn p-0");
     btn.setAttribute("data-bs-toggle", "modal");
     btn.setAttribute("data-bs-target", "#staticBackdrop");
     btn.innerHTML = '<i class="bi bi-gear"></i>';
@@ -220,7 +222,7 @@ function init_Buttons(button_info, parent) {
     for (const sh in SHOW_HIDE_INFO) {
         // button group
         const btnGrp = document.createElement("div");
-        btnGrp.setAttribute("class", "btn-group btn-group-sm");
+        // btnGrp.setAttribute("class", "btn-group btn-group-sm");
         btnGrp.setAttribute("role", "group");
         btnGrp.setAttribute("aria-label", "First group");
 

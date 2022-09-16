@@ -88,8 +88,9 @@ PRODUCT_TYPE_WHITE_LIST = (
 
 _handlers = []
 
+PALETTE_WIDTH = 260
 PALETTE_HEIGHT_NORMAL = 170
-PALETTE_HEIGHT_OPTION = 350
+PALETTE_HEIGHT_OPTION = 340
 
 
 # ********
@@ -270,7 +271,7 @@ def createPalette():
             isVisible=True,
             showCloseButton=True,
             isResizable=True,
-            width=310,
+            width=PALETTE_WIDTH,
             height=PALETTE_HEIGHT_NORMAL,
             useNewWebBrowser=True
         )
