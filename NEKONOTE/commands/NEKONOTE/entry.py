@@ -272,7 +272,7 @@ def createPalette():
             htmlFileURL=PALETTE_URL,
             isVisible=True,
             showCloseButton=True,
-            isResizable=True,
+            isResizable=False,
             width=PALETTE_WIDTH,
             height=PALETTE_HEIGHT_NORMAL,
             useNewWebBrowser=True
