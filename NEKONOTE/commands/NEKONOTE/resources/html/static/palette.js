@@ -1,6 +1,6 @@
 // fusion360 api
 
-const DEBUG = false;
+const DEBUG = true;
 
 const SHOW_HIDE_INFO = {
     "Show" : {
@@ -95,11 +95,22 @@ window.fusionJavaScriptHandler = {
     handle: function (action, data) {
         try {
             if (action === "command_event") {
+                dumpLog("call command_event")
                 let values = JSON.parse(data);
                 dumpLog(values['value']);
                 setDisabledByButton(toBoolean(values["value"]), "button");
                 setDisabledById(toBoolean(values["value"]), SCOPE_SWITCH_ID);
-                setDisabledById(toBoolean(values["value"]), SCOPE_CHILDREN_ID);
+                const sw = document.getElementById(SCOPE_SWITCH_ID);
+                const chi = document.getElementById(SCOPE_CHILDREN_ID);
+                if (sw.disabled) {
+                    chi.disabled = true;
+                } else {
+                    if (sw.checked) {
+                        chi.disabled = false;
+                    } else {
+                        chi.disabled = true;
+                    };
+                };
             } else if (action === "debugger") {
                 debugger;
             } else {
