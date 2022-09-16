@@ -60,12 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 init_Buttons(
                     BUTTON_INFO,
-                    // buttons
                     button_group
                 );
-
-                // scope_pref
-                const scope_pref = document.getElementById("scope_pref");
 
                 // scope
                 const scope_option = document.getElementById("scope");
@@ -104,7 +100,6 @@ window.fusionJavaScriptHandler = {
                 setDisabledByButton(toBoolean(values["value"]), "button");
                 setDisabledById(toBoolean(values["value"]), SCOPE_SWITCH_ID);
                 setDisabledById(toBoolean(values["value"]), SCOPE_CHILDREN_ID);
-
             } else if (action === "debugger") {
                 debugger;
             } else {
@@ -118,17 +113,20 @@ window.fusionJavaScriptHandler = {
     },
 };
 
-
 function init_Modal(button_info, parent) {
+
+    // div
+    const tooltip_div = document.createElement("div");
+    tooltip_div.setAttribute("data-bs-toggle", "tooltip");
+    tooltip_div.setAttribute("data-bs-placement", "top");
+    tooltip_div.setAttribute("title", button_info["Prefrences"]);
+    parent.appendChild(tooltip_div);
 
     // button
     const btn = document.createElement("button");
     btn.setAttribute("class", "btn btn-outline-dark btn-sm customBtn p-0");
     btn.setAttribute("data-bs-toggle", "modal");
     btn.setAttribute("data-bs-target", "#staticBackdrop");
-    // btn.setAttribute("data-bs-toggle", "tooltip");
-    // btn.setAttribute("data-bs-placement", "top");
-    // btn.setAttribute("title", "hoge");
     btn.innerHTML = '<i class="bi bi-gear"></i>';
     btn.addEventListener('click',function(){
         let args = {
@@ -136,7 +134,7 @@ function init_Modal(button_info, parent) {
         };
         adsk.fusionSendData('option', JSON.stringify(args));
     });
-    parent.appendChild(btn);
+    tooltip_div.appendChild(btn);
 
     // modal
     const modal_fade = document.createElement("div");

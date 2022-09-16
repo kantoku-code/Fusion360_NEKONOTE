@@ -1,6 +1,5 @@
 import json
 import adsk.core
-# import os
 import pathlib
 from ...lib import fusion360utils as futil
 from ... import config
@@ -20,7 +19,7 @@ LANGS = [
     "ko-KR",
     "zh-CN",
 ]
-DEBUG_LANG = LANGS[6]
+DEBUG_LANG = LANGS[0]
 
 THIS_DIR = pathlib.Path(__file__).resolve().parent
 
