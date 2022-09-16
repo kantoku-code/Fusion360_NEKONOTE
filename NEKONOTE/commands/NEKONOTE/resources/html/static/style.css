@@ -35,3 +35,7 @@
 .p-1 {
   padding: 1px !important;
 }
+
+.btn:hover {
+  background: #d362c7;
+}
