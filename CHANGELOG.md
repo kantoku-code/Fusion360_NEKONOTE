@@ -1,7 +1,7 @@
 # Change of Fusion360 NEKONOTE
 
 ## 0.0.10
-+ Winのみインストーラー追加
++ ~~Winのみインストーラー追加~~
 + jsパス修正
 
 ## 0.0.9
