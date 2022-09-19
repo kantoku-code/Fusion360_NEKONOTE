@@ -14,6 +14,7 @@ To install, download/extract the zip file and register the "NEKONOTE" folder as 
 
 To register add-ins, follow the instructions [here](https://knowledge.autodesk.com/support/fusion-360/troubleshooting/caas/sfdcarticles/sfdcarticles/How-to-install-an-ADD-IN-and-Script-in-Fusion-360.html).
 
+---
 
 ## **Usage**:
 
