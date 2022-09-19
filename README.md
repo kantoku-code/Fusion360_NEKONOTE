@@ -1,4 +1,120 @@
 # ***Fusion360 NEKONOTE***
+This is an add-in for the Autodesk software Fusion360.
+
+It shows/hides various folders in the browser tree at once.
+
+In Japanese, the busy state is expressed as "Neko no te meshimasu" (I want to borrow the cat's paw).
+Is it really helpful to have a cat's paw(NEKONOTE)?
+
+---
+
+## **Installation**:
+
+To install, download/extract the zip file and register the "NEKONOTE" folder as an **add-in**.
+
+To register add-ins, follow the instructions [here](https://knowledge.autodesk.com/support/fusion-360/troubleshooting/caas/sfdcarticles/sfdcarticles/How-to-install-an-ADD-IN-and-Script-in-Fusion-360.html).
+
+
+## **Usage**:
+
+After launching the add-in, the "NEKONOTE" command will be added in "Utilities" - "Utilities".
+
+![Alt text](./resources/menu_eng.png)
+
+By clicking on it, a dialog will appear.
+
+The dialog can be used for other tasks while it is displayed.
+
+![Alt text](./resources/dialog_eng.png)
+
+※The displayed text will switch between the languages supported by Fusion360.
+
+#### show/hide buttons:
+The top row are buttons to show and the bottom row are buttons to hide.
+
+The targets are the following folders, the same as in GUI (manual operation).
+
+(〇: operation target ✕: not target －: not shown)
+
+|   | without link | with link | in-place editing |
+| ------------- | ------------- | ------------- | ------------- |
+| Origin | 〇 | 〇 | 〇 |
+| Analysis | 〇 | － | 〇 |
+| Origin of a joint | 〇 | ✕ | 〇 |
+| Joint | 〇 | ✕ | 〇 |
+| Body | 〇 | 〇 | 〇 |
+| Canvas | 〇 | ✕| 〇 |
+| Decal | 〇 | ✕| 〇 |
+| Sketch | 〇 | 〇 | 〇 |
+| Construction | 〇 | 〇 | 〇 |
+
+The display/hide of each element within a folder is not changed because only the folder is displayed/hidden.
+
+#### Processing Scope:
+
++ OFF: Show/hide for the entire active document.
++ ON: show/hide only for elements of the active component.
++ ON+include children: show/hide only for elements below the active component.
+
+#### Preferences:
+
+By unchecking each item, you can reduce the number of buttons to be displayed. However, it is not recommended to reduce the number of buttons because the layout will be broken if the number of buttons is greatly reduced.
+
+![Alt text](./resources/preferences_eng.png)
+
+---
+
+## **Notes/Limitations** :
+
++ Dialogs are set to not be resizable.
+  + After docking the dialog to the top, bottom, left or right of the Fusion360, the size will become undesirable when undocked. If this happens, press the "" Preferences button to close it and it will return to its initial size.
+
+  ![Alt text](./resources/resize_eng.png)
+
++ Not tested on MAC
++ Works only when "design" "render".
++ When something is selected, show/hide will deselect it.
++ Show/Hide does not change for hidden components.
++ Dialog cannot be invoked during in-place editing. (Please invoke it beforehand.)
++ "Active" during in-place editing may not be changed to show/hide correctly. We have confirmed the following conditions.
+    + "Origin" is operated while "SubAssy" is active.
+      + "Whole" does not process higher level components.
+
+      ![Alt text](./resources/EditInPlace1_eng.png)
+
+    + If "Origin" is operated while "Part_A" (internal component in SubAssy) is active.
+      + "Whole" will process up to the component (SubAssy in the image) that entered the in-place editing, but not the higher level components.
+      + "Active" will not process the active component, but the component (SubAssy in the image) that entered the in-place edit will be processed.
+      + "active + includes children" will process the in-place editing component (SubAssy in the image) and the child components.
+
+      ![Alt text](./resources/EditInPlace2_eng.png)
+
+  + If a child component in a component during in-place editing is an external component, as shown above, "Joint origin", "Joint", "Canvas", "Decal" will not be processed.
+    + As an example, with "SubAssy" active, the decals for "Part_B" are not processed.
+
+      ![Alt text](./resources/EditInPlace3_eng.png)
+
+---
+
+## **Action** :
+
+The following environment is confirmed.
+
+- Fusion360 Ver2.0.14113
+- Windows10 64bit Pro , Home
+
+---
+
+## **License**:
+- MIT
+
+
+---
+
+# *** 以下は日本語です。***
+
+---
+
 これは、オートデスクソフトウェア「Fusion360」のアドインです。
 
 ブラウザツリーの各種フォルダーの表示/非表示をまとめて行います。
@@ -76,18 +192,19 @@
     + "SubAssy" がアクティブな状態で "原点" を操作した場合。
       + "全体" で行っても上位のコンポーネントは処理しません。
 
-      ![Alt text](./resources/EditInPlace1.png)
+      ![Alt text](./resources/EditInPlace1_jpn.png)
 
     + "Part_A"(SubAssy内の内部コンポーネント) がアクティブな状態で "原点" を操作した場合。
       + "全体" で行ってもインプレイス編集には入ったコンポーネント(画像ではSubAssy)までは処理しますが、上位のコンポーネントは処理しません。
       + "アクティブ" で行ってもアクティブなコンポーネントは処理されず、インプレイス編集には入ったコンポーネント(画像ではSubAssy)が処理しますが。
       + "アクティブ+子も含む" で行ってもインプレイス編集には入ったコンポーネント(画像ではSubAssy)と子コンポーネントが処理されます。
 
-      ![Alt text](./resources/EditInPlace2.png)
+      ![Alt text](./resources/EditInPlace2_jpn.png)
 
   + インプレイス編集時のコンポーネント内の子コンポーネントが外部コンポーネントの場合は上記に示した通り、"ジョイントの原点","ジョイント","キャンバス","デカール" 処理しません。
     + 例として、"SubAssy" がアクティブな状態で "Part_B" のデカールは処理しません。
-      ![Alt text](./resources/EditInPlace3.png)
+
+      ![Alt text](./resources/EditInPlace3_jpn.png)
 
 + ~~何らかのコマンド実行直後は機能が停止している状態になっていますが、画面を少し動かしてください。~~
 + ~~非表示されているコンポーネント内の要素の表示が逆になる可能性があります。~~
@@ -118,7 +235,7 @@
 
 以下の環境で確認しています。
 
-- Fusion360 Ver2.0.14110
+- Fusion360 Ver2.0.14113
 - Windows10 64bit Pro , Home
 
 ---
