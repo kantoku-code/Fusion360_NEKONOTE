@@ -3,8 +3,8 @@ This is an add-in for the Autodesk software Fusion360.
 
 It shows/hides various folders in the browser tree at once.
 
-In Japanese, the busy state is expressed as "Neko no te meshimasu" (I want to borrow the cat's paw).
-Is it really helpful to have a cat's paw(NEKONOTE)?
+In Japanese, the busy state is expressed as "I want to borrow the cat's hand". 
+Is it really helpful to have a cat's hand(NEKONOTE)?
 
 ---
 
