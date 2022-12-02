@@ -101,7 +101,7 @@ By unchecking each item, you can reduce the number of buttons to be displayed. H
 
 The following environment is confirmed.
 
-- Fusion360 Ver2.0.14113
+- Fusion360 Ver2.0.15023
 - Windows10 64bit Pro , Home
 
 ---
@@ -236,7 +236,7 @@ The following environment is confirmed.
 
 以下の環境で確認しています。
 
-- Fusion360 Ver2.0.15023 
+- Fusion360 Ver2.0.15023
 - Windows10 64bit Pro , Home
 
 ---
