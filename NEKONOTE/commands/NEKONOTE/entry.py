@@ -18,8 +18,11 @@ LANGS = [
     "ja-JP",
     "ko-KR",
     "zh-CN",
+    "pl-PL",# ポーランド
+    "pt-BR",# ポルトガル-ブラジル
+    "tr-TR",# トルコ
 ]
-DEBUG_LANG = LANGS[0]
+DEBUG_LANG = LANGS[10]
 
 THIS_DIR = pathlib.Path(__file__).resolve().parent
 

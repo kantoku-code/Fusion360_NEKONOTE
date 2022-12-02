@@ -227,7 +227,7 @@ The following environment is confirmed.
 + ~~UIのボタンをもう少し整理する。~~
 + ~~環境設定ボタンにツールチップを追加する。~~
 + ~~"子も含む" が不適切なタイミングで有効になる。(ドキュメントの切り替え時)~~
-+ インストーラーを用意する。
++ ~~インストーラーを用意する。~~
 + 驚くほどの各アイコンのセンスの無さ
 
 ---
@@ -236,7 +236,7 @@ The following environment is confirmed.
 
 以下の環境で確認しています。
 
-- Fusion360 Ver2.0.14113
+- Fusion360 Ver2.0.15023 
 - Windows10 64bit Pro , Home
 
 ---
